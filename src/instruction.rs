@@ -93,18 +93,7 @@ impl AppInstruction {
               .map(u64::from_le_bytes)
               .ok_or(AppError::InvalidInstruction)?;
             Self::Swap { amount, limit }
-          }
-          4 => Self::FreezePool,
-          5 => Self::ThawPool,
-          6 => {
-            let amount = rest
-              .get(..8)
-              .and_then(|slice| slice.try_into().ok())
-              .map(u64::from_le_bytes)
-              .ok_or(AppError::InvalidInstruction)?;
-            Self::Earn { amount }
-          }
-          7 => Self::TransferPoolOwnership,
+          }          
           _ => return Err(AppError::InvalidInstruction.into()),
         })
       }
