@@ -15,6 +15,7 @@ use solana_program::{
 pub enum PoolState {
   Uninitialized,
   Initialized,
+  Frozen,
 }
 impl Default for PoolState {
   fn default() -> Self {
@@ -43,6 +44,10 @@ pub struct Pool {
 }
 
 impl Pool {
+  pub fn is_frozen(&self) -> bool {
+    self.state == PoolState::Frozen
+  }
+  
   pub fn get_reserve(&self, treasury: &Pubkey) -> Option<(u8, u64)> {
     if self.treasury_s == *treasury {
       return Some((0, self.reserve_s));

@@ -1,4 +1,5 @@
 use crate::error::AppError;
+use crate::helper::{oracle::Oracle};
 use crate::instruction::AppInstruction;
 use crate::interfaces::{xsplata::XSPLATA, xsplt::XSPLT};
 use crate::schema::{
@@ -86,7 +87,7 @@ impl Processor {
         Self::is_program(program_id, &[pool_acc])?;
         Self::is_signer(&[payer, pool_acc, vault_acc])?;
 
-        let mut pool_data = Pool::unpack_unchecked(&pool_acc.data.borrow())?;
+        let mut pool_data = Pool::unpack_from_slice(&pool_acc.data.borrow())?;
         let mint_lpt_data = Mint::unpack_unchecked(&mint_lpt_acc.data.borrow())?;
         let seed: &[&[&[u8]]] = &[&[&Self::safe_seed(pool_acc, treasurer, program_id)?[..]]];
         if pool_data.is_initialized() || mint_lpt_data.is_initialized() {
@@ -221,7 +222,7 @@ impl Processor {
         pool_data.mint_b = *mint_b_acc.key;
         pool_data.treasury_b = *treasury_b_acc.key;
         pool_data.reserve_b = reserve_b;
-        Pool::pack(pool_data, &mut pool_acc.data.borrow_mut())?;
+        Pool::pack_into_slice(pool_data, &mut pool_acc.data.borrow_mut())?;
 
         Ok(())
     }
@@ -255,7 +256,7 @@ impl Processor {
         Self::is_signer(&[owner])?;
 
         let mint_lpt_data = Mint::unpack(&mint_lpt_acc.data.borrow())?;
-        let mut pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        let mut pool_data = Pool::unpack_from_slice(&pool_acc.data.borrow())?;
         let seed: &[&[&[u8]]] = &[&[&Self::safe_seed(pool_acc, treasurer, program_id)?[..]]];
 
         if pool_data.mint_lpt != *mint_lpt_acc.key
@@ -293,7 +294,7 @@ impl Processor {
             XSPLT::transfer(delta_b, src_b_acc, treasury_b_acc, owner, splt_program, &[])?;
             pool_data.reserve_b = reserve_b;
         }
-        Pool::pack(pool_data, &mut pool_acc.data.borrow_mut())?;
+        Pool::pack_into_slice(pool_data, &mut pool_acc.data.borrow_mut())?;
         XSPLT::mint_to(lpt, mint_lpt_acc, lpt_acc, treasurer, splt_program, seed)?;
 
         Ok(())
@@ -327,7 +328,7 @@ impl Processor {
         let seed: &[&[&[u8]]] = &[&[&Self::safe_seed(pool_acc, treasurer, program_id)?[..]]];
 
         let mint_lpt_data = Mint::unpack(&mint_lpt_acc.data.borrow())?;
-        let mut pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        let mut pool_data = Pool::unpack_from_slice(&pool_acc.data.borrow())?;
         if pool_data.mint_lpt != *mint_lpt_acc.key
             || pool_data.treasury_s != *treasury_s_acc.key
             || pool_data.treasury_a != *treasury_a_acc.key
@@ -378,7 +379,7 @@ impl Processor {
         if pool_data.reserve_s == 0 {
             pool_data.state = PoolState::Frozen;
         }
-        Pool::pack(pool_data, &mut pool_acc.data.borrow_mut())?;
+        Pool::pack_into_slice(pool_data, &mut pool_acc.data.borrow_mut())?;
         // Withdraw token
         XSPLT::transfer(
             delta_s,
@@ -414,6 +415,109 @@ impl Processor {
         program_id: &Pubkey,
         accounts: &[AccountInfo],
     ) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let payer = next_account_info(accounts_iter)?;
+        let pool_acc = next_account_info(accounts_iter)?;
+        let vault_acc = next_account_info(accounts_iter)?;
+
+        let src_acc = next_account_info(accounts_iter)?;
+        let treasury_bid_acc = next_account_info(accounts_iter)?;
+
+        let dst_acc = next_account_info(accounts_iter)?;
+        let treasury_ask_acc = next_account_info(accounts_iter)?;
+
+        let treasury_sen_acc = next_account_info(accounts_iter)?;
+
+        let treasurer = next_account_info(accounts_iter)?;
+        let splt_program = next_account_info(accounts_iter)?;
+
+        Self::is_program(program_id, &[pool_acc])?;
+        Self::is_signer(&[payer])?;
+
+        let mut pool_data = Pool::unpack_from_slice(&pool_acc.data.borrow())?;
+        let seed: &[&[&[u8]]] = &[&[&Self::safe_seed(pool_acc, treasurer, program_id)?[..]]];
+        let (bid_code, bid_reserve) = pool_data
+            .get_reserve(treasury_bid_acc.key)
+            .ok_or(AppError::UnmatchedPool)?;
+        let (ask_code, ask_reserve) = pool_data
+            .get_reserve(treasury_ask_acc.key)
+            .ok_or(AppError::UnmatchedPool)?;
+        let (sen_code, _) = pool_data
+            .get_reserve(treasury_sen_acc.key)
+            .ok_or(AppError::UnmatchedPool)?;
+        if sen_code != 0 {
+          return Err(AppError::UnmatchedPool.into());
+        }
+
+        if pool_data.is_frozen() {
+          return Err(AppError::FrozenPool.into());
+        }
+        if amount == 0 {
+           return Err(AppError::ZeroValue.into());
+        }
+        if *treasury_bid_acc.key == *treasury_ask_acc.key {
+          return Ok(());
+        }
+
+        let new_bid_reserve = bid_reserve.checked_add(amount).ok_or(AppError::Overflow)?;
+        let (new_ask_reserve, paid_amount, earning) =
+        Oracle::curve_in_fee(new_bid_reserve, bid_reserve, ask_reserve, ask_code == 0)
+            .ok_or(AppError::Overflow)?;
+        if paid_amount < limit {
+           return Err(AppError::ExceedLimit.into());
+        }
+
+        XSPLT::transfer(amount, src_acc, treasury_bid_acc, payer, splt_program, &[])?;
+        match bid_code {
+            0 => pool_data.reserve_s = new_bid_reserve,
+            1 => pool_data.reserve_a = new_bid_reserve,
+            2 => pool_data.reserve_b = new_bid_reserve,
+            _ => return Err(AppError::UnmatchedPool.into()),
+        }
+        match ask_code {
+            0 => pool_data.reserve_s = new_ask_reserve,
+            1 => pool_data.reserve_a = new_ask_reserve,
+            2 => pool_data.reserve_b = new_ask_reserve,
+            _ => return Err(AppError::UnmatchedPool.into()),
+        }
+        XSPLT::transfer(
+            paid_amount,
+            treasury_ask_acc,
+            dst_acc,
+            treasurer,
+            splt_program,
+            seed,
+        )?;
+
+        if earning != 0 {
+        let new_ask_reserve_with_earning = new_ask_reserve
+            .checked_add(earning)
+            .ok_or(AppError::Overflow)?;
+        let (new_sen_reserve, earning_in_sen, _) = Oracle::curve_in_fee(
+            new_ask_reserve_with_earning, 
+            new_ask_reserve,              
+            pool_data.reserve_s,
+            true,
+        )
+        .ok_or(AppError::Overflow)?;
+        match ask_code {
+            1 => pool_data.reserve_a = new_ask_reserve_with_earning,
+            2 => pool_data.reserve_b = new_ask_reserve_with_earning,
+            _ => return Err(AppError::UnmatchedPool.into()),
+        }
+        pool_data.reserve_s = new_sen_reserve;
+        XSPLT::transfer(
+            earning_in_sen,
+            treasury_sen_acc,
+            vault_acc,
+            treasurer,
+            splt_program,
+            seed,
+        )?;
+        }
+
+        Pool::pack_into_slice(pool_data, &mut pool_acc.data.borrow_mut())?;
+
         Ok(())
     }
 

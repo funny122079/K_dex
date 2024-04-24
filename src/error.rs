@@ -19,10 +19,18 @@ pub enum AppError {
   IncorrectProgramId,
   #[error("Already constructed")]
   ConstructorOnce,
+  #[error("Operation overflowed")]
+  Overflow,
+  #[error("Pool unmatched")]
+  UnmatchedPool,
+  #[error("Pool frozen")]
+  FrozenPool,
   #[error("Zero value")]
   ZeroValue,
   #[error("Invalid mint")]
-  InvalidMint,  
+  InvalidMint,
+  #[error("Exceed limit")]
+  ExceedLimit,
 }
 
 impl From<AppError> for ProgramError {
@@ -47,8 +55,12 @@ impl PrintProgramError for AppError {
       AppError::InvalidOwner => msg!("Error: Invalid owner"),
       AppError::IncorrectProgramId => msg!("Error: Incorrect program id"),
       AppError::ConstructorOnce => msg!("Error: Already constructed"),
+      AppError::Overflow => msg!("Error: Operation overflowed"),
+      AppError::UnmatchedPool => msg!("Error: Pool unmatched"),
+      AppError::FrozenPool => msg!("Error: Pool frozen"),
       AppError::ZeroValue => msg!("Error: Zero value"),      
       AppError::InvalidMint => msg!("Error: Invalid mint"),
+      AppError::ExceedLimit => msg!("Error: Exceed limit"),
     }
   }
 }
