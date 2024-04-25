@@ -20,7 +20,9 @@ pub enum AppInstruction {
   Swap {
     amount: u64,
     limit: u64,
-  }
+  },
+  FreezePool,
+  ThawPool,
 }
 
 impl AppInstruction {
@@ -94,6 +96,8 @@ impl AppInstruction {
               .ok_or(AppError::InvalidInstruction)?;
             Self::Swap { amount, limit }
           }          
+      	  4 => Self::FreezePool,
+	        5 => Self::ThawPool,
           _ => return Err(AppError::InvalidInstruction.into()),
         })
       }

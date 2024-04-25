@@ -94,16 +94,31 @@ impl Processor {
             return Err(AppError::ConstructorOnce.into());
         }
 
-        if *proof_acc.key != program_id.xor(&(pool_acc.key.xor(treasurer.key)))
-        || *mint_s_acc.key == *mint_a_acc.key
-        || *mint_s_acc.key == *mint_b_acc.key
-        {
-            return Err(AppError::InvalidMint.into());
-        }
+    let pool_treasurer_xor_key = match Self::key_xor(pool_acc.key, treasurer.key) {
+      Ok(pool_treasurer_xor_key) => pool_treasurer_xor_key,
+      Err(e) => {
+        msg!("processor-initialize_pool: xor pool_acc-treasurer error");
+        return Err(AppError::ConstructorOnce.into());
+      }
+    };
 
-        if reserve_s == 0 || reserve_a == 0 || reserve_b == 0 {
-            return Err(AppError::ZeroValue.into());
-        }
+    let program_xor_key = match Self::key_xor(program_id, &pool_treasurer_xor_key) {
+      Ok(program_xor_key) => program_xor_key,
+      Err(e) => {
+        msg!("processor-initialize_pool: xor program_id-pool_treasurer error");
+        return Err(AppError::ConstructorOnce.into());
+      }
+    };
+
+    if *proof_acc.key != program_xor_key
+      || *mint_s_acc.key == *mint_a_acc.key
+      || *mint_s_acc.key == *mint_b_acc.key
+    {
+      return Err(AppError::InvalidMint.into());
+    }
+    if reserve_s == 0 || reserve_a == 0 || reserve_b == 0 {
+      return Err(AppError::ZeroValue.into());
+    }
 
         XSPLATA::initialize_account(
             payer,
@@ -519,6 +534,66 @@ impl Processor {
         Pool::pack_into_slice(pool_data, &mut pool_acc.data.borrow_mut())?;
 
         Ok(())
+    } 
+
+    pub fn freeze_pool(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let owner = next_account_info(accounts_iter)?;
+        let pool_acc = next_account_info(accounts_iter)?;
+
+        Self::is_program(program_id, &[pool_acc])?;
+        Self::is_signer(&[owner])?;
+        Self::is_pool_owner(owner, pool_acc)?;
+
+        let mut pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        pool_data.state = PoolState::Frozen;
+        Pool::pack(pool_data, &mut pool_acc.data.borrow_mut())?;
+
+        Ok(())
+    }
+
+    pub fn thaw_pool(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let owner = next_account_info(accounts_iter)?;
+        let pool_acc = next_account_info(accounts_iter)?;
+
+        Self::is_program(program_id, &[pool_acc])?;
+        Self::is_signer(&[owner])?;
+        Self::is_pool_owner(owner, pool_acc)?;
+
+        let mut pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        pool_data.state = PoolState::Initialized;
+        Pool::pack(pool_data, &mut pool_acc.data.borrow_mut())?;
+
+        Ok(())
+    }    
+
+    pub fn earn(amount: u64, program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let owner = next_account_info(accounts_iter)?;
+        let pool_acc = next_account_info(accounts_iter)?;
+        let vault_acc = next_account_info(accounts_iter)?;
+        let dst_acc = next_account_info(accounts_iter)?;
+        let treasurer = next_account_info(accounts_iter)?;
+        let splt_program = next_account_info(accounts_iter)?;
+
+        Self::is_program(program_id, &[pool_acc])?;
+        Self::is_signer(&[owner])?;
+        Self::is_pool_owner(owner, pool_acc)?;
+
+        let pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        let seed: &[&[&[u8]]] = &[&[&Self::safe_seed(pool_acc, treasurer, program_id)?[..]]];
+        if pool_data.vault != *vault_acc.key {
+            return Err(AppError::InvalidOwner.into());
+        }
+
+        if amount == 0 {
+            return Err(AppError::ZeroValue.into());
+        }
+        
+        XSPLT::transfer(amount, vault_acc, dst_acc, treasurer, splt_program, seed)?;
+
+        Ok(())
     }
 
     pub fn is_program(program_id: &Pubkey, accounts: &[&AccountInfo]) -> ProgramResult {
@@ -541,6 +616,15 @@ impl Processor {
         Ok(())
     }
 
+    pub fn is_pool_owner(owner: &AccountInfo, pool_acc: &AccountInfo) -> ProgramResult {
+        let pool_data = Pool::unpack(&pool_acc.data.borrow())?;
+        if pool_data.owner != *owner.key {
+          return Err(AppError::InvalidOwner.into());
+        }
+
+        Ok(())
+    }
+
     pub fn safe_seed(
         seed_acc: &AccountInfo,
         expected_acc: &AccountInfo,
@@ -553,4 +637,21 @@ impl Processor {
         }
         Ok(seed)
     }
+
+  pub fn key_xor(
+    left_key: &Pubkey,
+    right_key: &Pubkey,
+  ) -> Result<Pubkey, PubkeyError> {
+    let left_key_bytes: [u8; 32] = left_key.to_bytes();
+    let right_key_bytes: [u8; 32] = right_key.to_bytes();
+    let mut xor_key_bytes: [u8; 32] = [0; 32];   
+
+    for i in 0..32 {
+      xor_key_bytes[i] = left_key_bytes[i] ^ right_key_bytes[i];
+    }
+
+    let xor_key = Pubkey::new_from_array(xor_key_bytes);
+    
+    Ok(xor_key)
+  }
 }
