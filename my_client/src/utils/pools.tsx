@@ -8,6 +8,7 @@ import {
 import { sendTransaction, useConnection } from "./connection";
 import { useEffect, useState } from "react";
 import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
+import { notify } from "./notifications";
 import {
   cache,
   getCachedAccount,
@@ -34,7 +35,6 @@ export const removeLiquidity = async (
     return;
   }
 
-  // TODO get min amounts based on total supply and liquidity
   const minAmount0 = 0;
   const minAmount1 = 0;
 
@@ -60,7 +60,6 @@ export const removeLiquidity = async (
     AccountLayout.span
   );
 
-  // TODO: check if one of to accounts needs to be native sol ... if yes unwrap it ...
   const toAccounts: PublicKey[] = [
     await findOrCreateAccountByMint(
       wallet.publicKey,

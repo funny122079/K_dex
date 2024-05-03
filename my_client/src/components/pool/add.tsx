@@ -13,6 +13,7 @@ import { SupplyOverview } from "./supplyOverview";
 import { CurrencyInput } from "../currencyInput";
 import { DEFAULT_DENOMINATOR, PoolConfigCard } from "./config";
 import "./add.less";
+import { PoolConfig } from "../../models";
 import { SWAP_PROGRAM_OWNER_FEE_ADDRESS } from "../../utils/ids";
 import { useCurrencyPairState } from "../../utils/currencyPair";
 import {

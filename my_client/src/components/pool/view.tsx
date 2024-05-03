@@ -6,6 +6,7 @@ import { getPoolName } from "../../utils/utils";
 import { useMint } from "../../utils/accounts";
 import { useConnectionConfig } from "../../utils/connection";
 import { PoolIcon } from "../tokenIcon";
+import { PoolInfo, TokenAccount } from "../../models";
 import { useCurrencyPairState } from "../../utils/currencyPair";
 import "./view.less";
 
