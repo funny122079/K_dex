@@ -21,26 +21,7 @@ console.debug(`Host address: ${SWAP_HOST_FEE_ADDRESS?.toBase58()}`);
 console.debug(`Owner address: ${SWAP_PROGRAM_OWNER_FEE_ADDRESS?.toBase58()}`);
 
 // legacy pools are used to show users contributions in those pools to allow for withdrawals of funds
-export const PROGRAM_IDS = [
-  {
-    name: "mainnet-beta",
-    swap: () => ({
-      current: new PublicKey("9qvG1zUp8xF1Bi4m6UdRNby1BAAuaDrUxSpv4CmRRMjL"),
-    }),
-  },
-  {
-    name: "testnet",
-    swap: () => ({
-      current: new PublicKey("2n2dsFSgmPcZ8jkmBZLGUM2nzuFqcBGQ3JEEj6RJJcEg"),
-      
-    }),
-  },
-  {
-    name: "devnet",
-    swap: () => ({
-      current: new PublicKey("BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ"),      
-    }),
-  },
+export const PROGRAM_IDS = [  
   {
     name: "localnet",
     swap: () => ({
@@ -64,5 +45,6 @@ export const programIds = () => {
   return {
     token: TOKEN_PROGRAM_ID,
     swap: SWAP_PROGRAM_ID,
+    swap_legacy: SWAP_PROGRAM_LEGACY_IDS,
   };
 };

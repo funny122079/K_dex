@@ -5,6 +5,8 @@ import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { programIds, SWAP_HOST_FEE_ADDRESS, WRAPPED_SOL_MINT } from "./ids";
 import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 import { usePools } from "./pools";
+import { TokenAccount, PoolInfo } from "./../models";
+import { notify } from "./notifications";
 
 const AccountsContext = React.createContext<any>(null);
 
@@ -324,6 +326,10 @@ export function useMint(id?: string) {
       .getMint(connection, id)
       .then(setMint)
       .catch((err) =>
+        notify({
+          message: err.message,
+          type: "error",
+        })
       );
     const onAccountEvent = (e: Event) => {
       const event = e as AccountUpdateEvent;
@@ -364,6 +370,10 @@ export function useAccount(pubKey?: PublicKey) {
         }
 
         const acc = await cache.getAccount(connection, key).catch((err) =>
+          notify({
+            message: err.message,
+            type: "error",
+          })
         );
         if (acc) {
           setAccount(acc);

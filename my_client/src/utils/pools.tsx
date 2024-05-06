@@ -416,16 +416,15 @@ export const usePoolForBasket = (mints: (string | undefined)[]) => {
   const sortedMints = [...mints].sort();
   useEffect(() => {
     (async () => {
-      // reset pool during query
       setPool(undefined);
 
       let matchingPool = pools
         .filter((p) => !p.legacy)
         .filter((p) =>
           p.pubkeys.holdingMints
-            .map((a) => a.toBase58())
+            .map((a: any) => a.toBase58())
             .sort()
-            .every((address, i) => address === sortedMints[i])
+            .every((address: any, i: any) => address === sortedMints[i])
         );
 
       for (let i = 0; i < matchingPool.length; i++) {
@@ -461,7 +460,7 @@ export const useOwnedPools = () => {
     .filter((p) => map.has(p.pubkeys.mint.toBase58()))
     .map((item) => {
       let feeAccount = item.pubkeys.feeAccount?.toBase58();
-      return map.get(item.pubkeys.mint.toBase58())?.map((a) => {
+      return map.get(item.pubkeys.mint.toBase58())?.map((a:any) => {
         return {
           account: a as TokenAccount,
           isFeeAccount: feeAccount === a.pubkey.toBase58(),

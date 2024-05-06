@@ -9,7 +9,7 @@ import { AccountsProvider } from "./utils/accounts";
 import { CurrencyPairProvider } from "./utils/currencyPair";
 
 ReactDOM.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <ConnectionProvider>
       <WalletProvider>
         <AccountsProvider>
@@ -18,8 +18,8 @@ ReactDOM.render(
           </CurrencyPairProvider>
         </AccountsProvider>
       </WalletProvider>
-    </ConnectionProvider>
-  </React.StrictMode>,
+    </ConnectionProvider>,
+  // </React.StrictMode>,
   document.getElementById("root")
 );
 
