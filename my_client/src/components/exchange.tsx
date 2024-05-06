@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Card, Popover } from "antd";
+import { TradeEntry } from "./trade";
 import { AddToLiquidity } from "./pool/add";
 import { PoolAccounts } from "./pool/view";
 import { useWallet } from "../utils/wallet";

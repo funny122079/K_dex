@@ -21,6 +21,18 @@ import {
   SWAP_PROGRAM_OWNER_FEE_ADDRESS,
   WRAPPED_SOL_MINT,
 } from "./ids";
+import {
+  LiquidityComponent,
+  PoolInfo,
+  TokenAccount,
+  createInitSwapInstruction,
+  TokenSwapLayout,
+  depositInstruction,
+  withdrawInstruction,
+  TokenSwapLayoutLegacyV0,
+  swapInstruction,
+  PoolConfig,
+} from "./../models";
 
 const LIQUIDITY_TOKEN_PRECISION = 8;
 
