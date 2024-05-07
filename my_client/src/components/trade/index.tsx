@@ -1,11 +1,11 @@
 import { Button, Spin } from "antd";
 import React, { useState } from "react";
-import {
-  useConnection,
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+
+import {  
   useConnectionConfig,
   useSlippageConfig,
 } from "../../utils/connection";
-import { useWallet } from "../../utils/wallet";
 import { CurrencyInput } from "../currencyInput";
 import { LoadingOutlined } from "@ant-design/icons";
 import { swap, usePoolForBasket } from "../../utils/pools";
@@ -18,8 +18,8 @@ import { getTokenName } from "../../utils/utils";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const TradeEntry = () => {
-  const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { publicKey } = useWallet();
+  const { connection } = useConnection();
   const [pendingTx, setPendingTx] = useState(false);
   const { A, B, setLastTypedAccount } = useCurrencyPairState();
   const pool = usePoolForBasket([A?.mintAddress, B?.mintAddress]);
@@ -52,7 +52,7 @@ export const TradeEntry = () => {
           },
         ];
 
-        await swap(connection, wallet, components, slippage, pool);
+        await swap(connection, publicKey, components, slippage, pool);
       } catch {
         notify({
           description:
@@ -107,10 +107,12 @@ export const TradeEntry = () => {
         className="trade-button"
         type="primary"
         size="large"
-        onClick={connected ? handleSwap : wallet.connect}
+        onClick={publicKey ? handleSwap : () => {
+          //wallet.connect
+        }} 
         style={{ width: "100%" }}
         disabled={
-          connected &&
+          (publicKey ? true : false) &&
           (pendingTx ||
             !A.account ||
             !B.mintAddress ||
@@ -126,7 +128,7 @@ export const TradeEntry = () => {
                 getTokenName(env, B.mintAddress)
               )
             : SWAP_LABEL,
-          connected,
+            publicKey ? true : false,
           env,
           A,
           B,

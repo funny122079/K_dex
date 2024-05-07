@@ -1,8 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { MintInfo } from "@solana/spl-token";
+import { useConnection } from '@solana/wallet-adapter-react'
+
 import { calculateDependentAmount, usePoolForBasket } from "./pools";
 import { useMint, useAccountByMint } from "./accounts";
-import { MintInfo } from "@solana/spl-token";
-import { useConnection } from "./connection";
 import { TokenAccount } from "../models";
 import { convert } from "./utils";
 
@@ -28,7 +29,7 @@ const CurrencyPairContext = React.createContext<CurrencyPairContextState | null>
 );
 
 export function CurrencyPairProvider({ children = null as any }) {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const [amountA, setAmountA] = useState("");
   const [amountB, setAmountB] = useState("");
   const [mintAddressA, setMintAddressA] = useState("");

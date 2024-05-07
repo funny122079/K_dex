@@ -4,8 +4,7 @@ import { getTokenName, formatTokenAmount, convert } from "../../utils/utils";
 import { PieChart, Pie, Cell } from "recharts";
 import { useMint, useAccount } from "../../utils/accounts";
 import {
-  ENDPOINTS,
-  useConnection,
+  ENDPOINTS,  
   useConnectionConfig,
 } from "../../utils/connection";
 import { PoolInfo} from "../../models";
@@ -46,9 +45,9 @@ const useMidPriceInUSD = (mint: string) => {
     setIsBase(true);
     setPrice(undefined);
 
-    const SERUM_TOKEN = TOKEN_MINTS.find((a) => a.address.toBase58() === mint);
+    const SERUM_TOKEN = TOKEN_MINTS.find((a: any) => a.address.toBase58() === mint);
     const marketName = `${SERUM_TOKEN?.name}/USDC`;
-    const marketInfo = MARKETS.find((m) => m.name === marketName);
+    const marketInfo = MARKETS.find((m: any) => m.name === marketName);
 
     if (STABLE_COINS.has(SERUM_TOKEN?.name || "")) {
       setIsBase(true);

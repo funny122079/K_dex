@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { addLiquidity, usePoolForBasket } from "../../utils/pools";
+import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Button, Dropdown, Popover } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+
+import { addLiquidity, usePoolForBasket } from "../../utils/pools";
 import {  
   useConnectionConfig,
   useSlippageConfig,
 } from "../../utils/connection";
 import { Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 import { SupplyOverview } from "./supplyOverview";
 import { CurrencyInput } from "../currencyInput";
 import { DEFAULT_DENOMINATOR, PoolConfigCard } from "./config";
@@ -19,13 +21,12 @@ import {
   ADD_LIQUIDITY_LABEL,
   generateActionLabel,
 } from "../labels";
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const AddToLiquidity = () => {
   const { publicKey, sendTransaction } = useWallet();  
-  const connection = useConnection();
+  const { connection } = useConnection();
   const [pendingTx, setPendingTx] = useState(false);
   const { A, B, setLastTypedAccount } = useCurrencyPairState();
   const pool = usePoolForBasket([A?.mintAddress, B?.mintAddress]);
