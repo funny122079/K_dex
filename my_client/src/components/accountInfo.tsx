@@ -1,14 +1,14 @@
 import React from "react";
-import { useWallet } from "./../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { shortenAddress } from "./../utils/utils";
 import { useNativeAccount } from "./../utils/accounts";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 export const AccountInfo = (props: {}) => {
-  const { wallet } = useWallet();
+  const { publicKey } = useWallet();
   const { account } = useNativeAccount();
 
-  if (!wallet || !wallet.publicKey) {
+  if (!publicKey) {
     return null;
   }
 
@@ -18,7 +18,7 @@ export const AccountInfo = (props: {}) => {
         {((account?.lamports || 0) / LAMPORTS_PER_SOL).toFixed(6)} SOL
       </span>
       <div className="wallet-key">
-        {shortenAddress(`${wallet.publicKey}`)}
+        {shortenAddress(`${publicKey}`)}
       </div>
     </div>
   );

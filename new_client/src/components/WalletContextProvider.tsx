@@ -9,7 +9,7 @@ import {
 	MathWalletAdapter,
 	SafePalWalletAdapter	
   } from "@solana/wallet-adapter-wallets";
-require('@solana/wallet-adapter-react-ui/styles.css');
+// require('@solana/wallet-adapter-react-ui/styles.css');
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 //   const endpoint = web3.clusterApiUrl('devnet')

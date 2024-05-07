@@ -1,5 +1,5 @@
 import { Button, Spin } from "antd";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 
 import {  
@@ -14,12 +14,14 @@ import { useCurrencyPairState } from "../../utils/currencyPair";
 import { generateActionLabel, POOL_NOT_AVAILABLE, SWAP_LABEL } from "../labels";
 import "./trade.less";
 import { getTokenName } from "../../utils/utils";
+import { WalletContext } from "../../utils/wallet";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const TradeEntry = () => {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const { setConnectTryFlag } = useContext(WalletContext);
   const [pendingTx, setPendingTx] = useState(false);
   const { A, B, setLastTypedAccount } = useCurrencyPairState();
   const pool = usePoolForBasket([A?.mintAddress, B?.mintAddress]);
@@ -108,7 +110,7 @@ export const TradeEntry = () => {
         type="primary"
         size="large"
         onClick={publicKey ? handleSwap : () => {
-          //wallet.connect
+          setConnectTryFlag(true);
         }} 
         style={{ width: "100%" }}
         disabled={

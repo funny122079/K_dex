@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from "react";
+import React, { useContext } from 'react';
 
 // export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
 export type ENV = "localnet";

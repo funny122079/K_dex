@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Button, Dropdown, Popover } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-
 import { addLiquidity, usePoolForBasket } from "../../utils/pools";
-import {  
+import { Button, Dropdown, Popover } from "antd";
+import { useWallet } from "../../utils/wallet";
+import {
+  useConnection,
   useConnectionConfig,
   useSlippageConfig,
 } from "../../utils/connection";
 import { Spin } from "antd";
-// import { SupplyOverview } from "./supplyOverview";
+import { LoadingOutlined } from "@ant-design/icons";
+import { notify } from "../../utils/notifications";
+import { SupplyOverview } from "./supplyOverview";
 import { CurrencyInput } from "../currencyInput";
 import { DEFAULT_DENOMINATOR, PoolConfigCard } from "./config";
 import "./add.less";
@@ -25,8 +26,8 @@ import {
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const AddToLiquidity = () => {
-  const { publicKey } = useWallet();  
-  const { connection } = useConnection();
+  const { wallet, connected } = useWallet();
+  const connection = useConnection();
   const [pendingTx, setPendingTx] = useState(false);
   const { A, B, setLastTypedAccount } = useCurrencyPairState();
   const pool = usePoolForBasket([A?.mintAddress, B?.mintAddress]);
@@ -42,7 +43,9 @@ export const AddToLiquidity = () => {
     ownerWithdrawFeeDenominator: DEFAULT_DENOMINATOR,
   });
 
-  const executeAction = async () => {
+  const executeAction = !connected
+    ? wallet.connect
+    : async () => {
       if (A.account && B.account && A.mint && B.mint) {
         setPendingTx(true);
         const components = [
@@ -58,21 +61,22 @@ export const AddToLiquidity = () => {
           },
         ];
 
-        if (!publicKey) {
-          console.log("Please, connect to your wallet!");
-          return;
-        }
-
-        addLiquidity(connection, publicKey, components, slippage, pool, options)
+        addLiquidity(connection, wallet, components, slippage, pool, options)
           .then(() => {
             setPendingTx(false);
           })
           .catch((e) => {
             console.log("Transaction failed", e);
+            notify({
+              description:
+                "Please try again and approve transactions from your wallet",
+              message: "Adding liquidity cancelled.",
+              type: "error",
+            });
             setPendingTx(false);
           });
       }
-  };
+    };
 
   const hasSufficientBalance = A.sufficientBalance() && B.sufficientBalance();
 
@@ -81,12 +85,12 @@ export const AddToLiquidity = () => {
       className="add-button"
       onClick={executeAction}
       disabled={
-        (publicKey ? true : false) &&
+        connected &&
         (pendingTx || !A.account || !B.account || A.account === B.account)
       }
       type="primary"
       size="large">
-      {generateActionLabel(CREATE_POOL_LABEL, publicKey ? true : false, env, A, B)}
+      {generateActionLabel(CREATE_POOL_LABEL, connected, env, A, B)}
       {pendingTx && <Spin indicator={antIcon} className="add-spinner" />}
     </Button>
   ) : (
@@ -94,14 +98,14 @@ export const AddToLiquidity = () => {
         className="add-button"
         onClick={executeAction}
         disabled={
-          (publicKey ? true : false) &&
+          connected &&
           (pendingTx || !A.account || !B.account || A.account === B.account)
         }
         type="primary"
         size="large"
         overlay={<PoolConfigCard options={options} setOptions={setOptions} />}
       >
-        {generateActionLabel(CREATE_POOL_LABEL, publicKey ? true : false, env, A, B)}
+        {generateActionLabel(CREATE_POOL_LABEL, connected, env, A, B)}
         {pendingTx && <Spin indicator={antIcon} className="add-spinner" />}
       </Dropdown.Button>
     );
@@ -152,10 +156,10 @@ export const AddToLiquidity = () => {
           B.setMint(item);
         }}
       />
-      {/* <SupplyOverview
+      <SupplyOverview
         mintAddress={[A.mintAddress, B.mintAddress]}
         pool={pool}
-      /> */}
+      />
       {pool && (
         <Button
           className="add-button"
@@ -163,7 +167,7 @@ export const AddToLiquidity = () => {
           size="large"
           onClick={executeAction}
           disabled={
-            (publicKey ? true : false) &&
+            connected &&
             (pendingTx ||
               !A.account ||
               !B.account ||
@@ -171,7 +175,7 @@ export const AddToLiquidity = () => {
               !hasSufficientBalance)
           }
         >
-          {generateActionLabel(ADD_LIQUIDITY_LABEL, publicKey ? true : false, env, A, B)}
+          {generateActionLabel(ADD_LIQUIDITY_LABEL, connected, env, A, B)}
           {pendingTx && <Spin indicator={antIcon} className="add-spinner" />}
         </Button>
       )}

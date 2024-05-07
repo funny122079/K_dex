@@ -1,0 +1,10 @@
+{
+  "short_name": "My New DEX",
+  "name": "My New DEX",
+  "icons": [
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

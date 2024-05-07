@@ -5,7 +5,6 @@ import {
   useConnectionConfig,
   useSlippageConfig,
 } from "../utils/connection";
-import { useWallet, WALLET_PROVIDERS } from "../utils/wallet";
 import { NumericInput } from "./numericInput";
 
 const Slippage = (props: {}) => {
@@ -69,7 +68,6 @@ const Slippage = (props: {}) => {
 };
 
 export const Settings = () => {
-  const { providerUrl, setProvider } = useWallet();
   const { endpoint, setEndpoint } = useConnectionConfig();
 
   return (
@@ -94,17 +92,7 @@ export const Settings = () => {
             </Select.Option>
           ))}
         </Select>
-      </div>
-      <div style={{ display: "grid" }}>
-        Wallet:{" "}
-        <Select onSelect={setProvider} value={providerUrl}>
-          {WALLET_PROVIDERS.map(({ name, url }) => (
-            <Select.Option value={url} key={url}>
-              {name}
-            </Select.Option>
-          ))}
-        </Select>
-      </div>
+      </div>      
     </>
   );
 };
