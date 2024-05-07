@@ -4,7 +4,7 @@ export const WRAPPED_SOL_MINT = new PublicKey(
   "So11111111111111111111111111111111111111112"
 );
 let TOKEN_PROGRAM_ID = new PublicKey(
-  ""
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
 
 let SWAP_PROGRAM_ID: PublicKey;
@@ -14,7 +14,7 @@ export const SWAP_HOST_FEE_ADDRESS = process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS
   ? new PublicKey(`${process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS}`)
   : undefined;
 export const SWAP_PROGRAM_OWNER_FEE_ADDRESS = new PublicKey(
-  ""
+  "HfoTxFR1Tm6kGmWgYWD6J7YHVy1UwqSULUGVLXkJqaKN"
 );
 
 console.debug(`Host address: ${SWAP_HOST_FEE_ADDRESS?.toBase58()}`);

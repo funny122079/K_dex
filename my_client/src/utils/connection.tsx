@@ -9,7 +9,8 @@ import {
 import React, { useContext, useEffect, useMemo } from "react";
 import { setProgramIds } from "./ids";
 
-export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
+// export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
+export type ENV = "localnet";
 
 export const ENDPOINTS = [
   // {

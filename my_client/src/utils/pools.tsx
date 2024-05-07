@@ -358,7 +358,7 @@ export const usePools = () => {
 
     Promise.all([
       queryPools(programIds().swap),
-      ...programIds().swap_legacy.map((leg) => queryPools(leg, true)),
+      // ...programIds().swap_legacy.map((leg) => queryPools(leg, true)),
     ]).then((all) => {
       setPools(all.flat());
     });

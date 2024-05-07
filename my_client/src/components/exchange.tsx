@@ -5,6 +5,7 @@ import { AddToLiquidity } from "./pool/add";
 import { PoolAccounts } from "./pool/view";
 import { useWallet } from "../utils/wallet";
 import { AccountInfo } from "./accountInfo";
+import { Settings } from './settings';
 import { SettingOutlined } from "@ant-design/icons";
 
 export const ExchangeView = (props: {}) => {
@@ -32,7 +33,6 @@ export const ExchangeView = (props: {}) => {
   const TopBar = (
     <div className="App-Bar">
       <div className="App-Bar-left">
-        <div className="App-logo" />
       </div>
       <div className="App-Bar-right">
         <Button type="text" size="large" style={{ color: "#2abdd2" }}>

@@ -3,6 +3,7 @@ import { calculateDependentAmount, usePoolForBasket } from "./pools";
 import { useMint, useAccountByMint } from "./accounts";
 import { MintInfo } from "@solana/spl-token";
 import { useConnection } from "./connection";
+import { TokenAccount } from "../models";
 import { convert } from "./utils";
 
 export interface CurrencyContextState {

@@ -8,6 +8,7 @@ import {
   useConnection,
   useConnectionConfig,
 } from "../../utils/connection";
+import { PoolInfo} from "../../models";
 import { MARKETS, TOKEN_MINTS, Market } from "@project-serum/serum";
 import { Connection } from "@solana/web3.js";
 

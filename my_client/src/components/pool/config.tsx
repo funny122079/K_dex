@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, Select } from "antd";
 import { NumericInput } from "../numericInput";
 import "./add.less";
+import { PoolConfig } from "../../models";
 
 const Option = Select.Option;
 
