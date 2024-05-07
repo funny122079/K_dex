@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Card, Select } from "antd";
 import { NumericInput } from "../numericInput";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../../utils/utils";
 import { useUserAccounts, useMint, useCachedPool } from "../../utils/accounts";
 import "./styles.less";
-import { useConnectionConfig } from "../../utils/connection";
+import { ConnectionContext } from "../../utils/connection";
 import { PoolIcon, TokenIcon } from "../tokenIcon";
 import PopularTokens from "../../utils/token-list.json";
 import { PublicKey } from "@solana/web3.js";
@@ -28,9 +28,9 @@ export const CurrencyInput = (props: {
   const { pools } = useCachedPool();
   const mint = useMint(props.mint);
 
-  const { env } = useConnectionConfig();
+  const connectionEnv = useContext(ConnectionContext);  
 
-  const tokens = PopularTokens[env] as KnownToken[];
+  const tokens = PopularTokens[connectionEnv.env] as KnownToken[];
 
   const renderPopularTokens = tokens.map((item) => {
     return (

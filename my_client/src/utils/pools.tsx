@@ -708,7 +708,7 @@ export async function calculateDependentAmount(
 
 // TODO: add ui to customize curve type
 async function _addLiquidityNewPool(
-  wallet: any,
+  wallet_publicKey: any,
   connection: Connection,
   components: LiquidityComponent[],
   options: PoolConfig
@@ -724,7 +724,7 @@ async function _addLiquidityNewPool(
   // Create account for pool liquidity token
   instructions.push(
     SystemProgram.createAccount({
-      fromPubkey: wallet.publicKey,
+      fromPubkey: wallet_publicKey,
       newAccountPubkey: liquidityTokenAccount.publicKey,
       lamports: await connection.getMinimumBalanceForRentExemption(
         MintLayout.span
@@ -771,7 +771,7 @@ async function _addLiquidityNewPool(
     holdingAccounts.push(
       createSplAccount(
         instructions,
-        wallet.publicKey,
+        wallet_publicKey,
         accountRentExempt,
         mintPublicKey,
         authority,
@@ -783,10 +783,10 @@ async function _addLiquidityNewPool(
   // creating depositor pool account
   const depositorAccount = createSplAccount(
     instructions,
-    wallet.publicKey,
+    wallet_publicKey,
     accountRentExempt,
     liquidityTokenAccount.publicKey,
-    wallet.publicKey,
+    wallet_publicKey,
     AccountLayout.span
   );
 
@@ -794,15 +794,15 @@ async function _addLiquidityNewPool(
   // creater of the pool is not allowed in some versions of token-swap program
   const feeAccount = createSplAccount(
     instructions,
-    wallet.publicKey,
+    wallet_publicKey,
     accountRentExempt,
     liquidityTokenAccount.publicKey,
-    SWAP_PROGRAM_OWNER_FEE_ADDRESS || wallet.publicKey,
+    SWAP_PROGRAM_OWNER_FEE_ADDRESS || wallet_publicKey,
     AccountLayout.span
   );
 
   // create all accounts in one transaction
-  let tx = await sendTransaction(connection, wallet, instructions, [
+  let tx = await sendTransaction(connection, wallet_publicKey, instructions, [
     liquidityTokenAccount,
     depositorAccount,
     feeAccount,
@@ -816,7 +816,7 @@ async function _addLiquidityNewPool(
 
   instructions.push(
     SystemProgram.createAccount({
-      fromPubkey: wallet.publicKey,
+      fromPubkey: wallet_publicKey,
       newAccountPubkey: tokenSwapAccount.publicKey,
       lamports: await connection.getMinimumBalanceForRentExemption(
         TokenSwapLayout.span
@@ -836,7 +836,7 @@ async function _addLiquidityNewPool(
       instructions,
       cleanupInstructions,
       leg.account,
-      wallet.publicKey,
+      wallet_publicKey,
       leg.amount + accountRentExempt,
       signers
     );
@@ -846,7 +846,7 @@ async function _addLiquidityNewPool(
         programIds().token,
         from,
         holdingAccounts[i].publicKey,
-        wallet.publicKey,
+        wallet_publicKey,
         [],
         leg.amount
       )
@@ -879,7 +879,7 @@ async function _addLiquidityNewPool(
   // initialize and provide inital liquidity to swap in 2nd (this prevents loss of funds)
   tx = await sendTransaction(
     connection,
-    wallet,
+    wallet_publicKey,
     instructions.concat(cleanupInstructions),
     [tokenSwapAccount, ...signers]
   );
