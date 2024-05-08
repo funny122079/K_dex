@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, message, Steps, theme } from 'antd';
 
+import { SelectToken } from '../SelectToken';
 import {
   CreateLPModalWrapper,
   CreateLPModalOverlay,
@@ -17,7 +18,7 @@ type CreateLPProps = {
 const createLPSteps = [
   {
     title: 'Select token & weights',
-    content: 'First-content',
+    content: <SelectToken />,
   },
   {
     title: 'Set liquidity',
@@ -44,7 +45,7 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
   const items = createLPSteps.map((item) => ({ key: item.title, title: item.title }));
 
   const contentStyle: React.CSSProperties = {
-    lineHeight: '260px',
+    height: '40vh',
     textAlign: 'center',
     color: token.colorTextTertiary,
     backgroundColor: token.colorFillAlter,

@@ -17,7 +17,7 @@ const ColoredText = styled.span<ColoredTextProps>`
       if (props.text_attr_kinds === 'secondary') {
         return props.theme.colors.secondaryCta;
       } else {
-        return props.theme.colors.primaryCta;
+        return "#555555FF";
       }
     }
   }};
