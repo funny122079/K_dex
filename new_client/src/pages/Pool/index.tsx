@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { MdSettings, MdHelp } from "react-icons/md";
 
 import type { SearchProps } from "antd/es/input/Search";
-import { Button, Input, Table } from "antd";
+import { Button, Checkbox, Input, Table } from "antd";
 import type { TableProps } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 
 import {
+  OwnerActionContainer,
   PoolContainer,
   PoolControlBar,
   PoolHeader,
@@ -17,11 +19,12 @@ import {
 
 import ColoredText from "../../components/typography/ColoredText";
 import { CreateLPModal } from "../../components/pool/CreateLPModal";
+import { LPDetailModal } from "../../components/pool/LPDetailModal";
 
 const { Search } = Input;
 
-interface PoolTableDataType {
-  key: string;
+export interface PoolTableDataType {
+  key: number;
   pools: string;
   tvl: number;
   fee: string;
@@ -29,9 +32,30 @@ interface PoolTableDataType {
   owner: boolean;
 }
 
+const PoolData: PoolTableDataType[] = [
+  {
+    key: 1,
+    pools: "(SOL, USDC)",
+    tvl: 115.33,
+    fee: "0.35%",
+    contribution: "1.32 LP",
+    owner: true,
+  },
+  {
+    key: 2,
+    pools: "(C98, USDC)",
+    tvl: 585.14,
+    fee: "0.25%",
+    contribution: "0 LP",
+    owner: false,
+  },
+];
+
 export const Pool: React.FC = () => {
-  const [poolData, setPoolData] = useState([]);
+  const [poolData, setPoolData] = useState(PoolData);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
+  const [showLPDetailModal, setShowLPDetailModal] = useState(false);
+  const [activePoolKey, setActivePoolKey] = useState(0);
   const [headerItem, setHeaderItem] = useState([
     {
       icon: <MdSettings size={20} />,
@@ -45,12 +69,12 @@ export const Pool: React.FC = () => {
 
   const poolTableColumns: TableProps<PoolTableDataType>["columns"] = [
     {
-      title: "No",
+      title: "NO",
       key: "no",
       render: (text, record, index) => index + 1,
     },
     {
-      title: "Pools",
+      title: "POOLS",
       dataIndex: "pools",
       key: "pools",
       //   render: (text) => <a>{text}</a>,
@@ -89,12 +113,17 @@ export const Pool: React.FC = () => {
       title: "Owner",
       key: "owner",
       dataIndex: "owner",
-      //   render: (_, record) => (
-      //     <Space size="middle">
-      //       <a>Invite {record.name}</a>
-      //       <a>Delete</a>
-      //     </Space>
-      //   ),
+      render: (_, { owner }) => (
+        <>
+          {owner && (
+            <OwnerActionContainer>
+              <Checkbox checked={true} />
+              <DeleteOutlined />
+            </OwnerActionContainer>
+          )}
+          {!owner && <Checkbox />}
+        </>
+      ),
     },
   ];
 
@@ -106,56 +135,81 @@ export const Pool: React.FC = () => {
 
   const onNewPoolHandler = () => {
     setShowCreatePoolModal(true);
-  }
+  };
 
   const onCloseModal = () => {
     setShowCreatePoolModal(false);
   };
 
+  const onCloseLPDetailModal = () => {
+    setShowLPDetailModal(false);
+  };
+
+  const showLPDetails = (LPKey: number) => {
+    setActivePoolKey(LPKey);
+    setShowLPDetailModal(true);
+  };
+
   return (
     <>
-    <PoolWrapper>
-      <PoolHeader>
-        <TitleContainer>
-          <img src="/assets/images/room-logo.png" alt="" draggable="false" />
-          <ColoredText
-            text_attr_kinds="other_color"
-            fonttype="medium"
-            font_name="fantasy"
-          >
-            Liquidity Pool
-          </ColoredText>
-        </TitleContainer>
-        <PoolHeaderSection>
-          <div className="room-header-setting">
-            {headerItem.map((item) => (
-              <p key={item.label}>
-                {item.icon}
-                <span>{item.label}</span>
-              </p>
-            ))}
-          </div>
-        </PoolHeaderSection>
-      </PoolHeader>
-      <PoolContainer>
-        <PoolControlBar>
-          <Search
-            placeholder="input search token"
-            onSearch={onSearch}
-            style={{ width: "40vw" }}
-          />
-          <Button type="primary" onClick={onNewPoolHandler}>+ New Pool</Button>
-        </PoolControlBar>
-        <PoolTableContainer>
-          <Table
-            className="rounded-table"
-            columns={poolTableColumns}
-            dataSource={poolData}
-          />
-        </PoolTableContainer>
-      </PoolContainer>
-    </PoolWrapper>
-    <CreateLPModal isShow={showCreatePoolModal} onClose={() => onCloseModal()} />
+      <PoolWrapper>
+        <PoolHeader>
+          <TitleContainer>
+            <img src="/assets/images/room-logo.png" alt="" draggable="false" />
+            <ColoredText
+              text_attr_kinds="other_color"
+              fonttype="medium"
+              font_name="fantasy"
+            >
+              Liquidity Pool
+            </ColoredText>
+          </TitleContainer>
+          <PoolHeaderSection>
+            <div className="room-header-setting">
+              {headerItem.map((item) => (
+                <p key={item.label}>
+                  {item.icon}
+                  <span>{item.label}</span>
+                </p>
+              ))}
+            </div>
+          </PoolHeaderSection>
+        </PoolHeader>
+        <PoolContainer>
+          <PoolControlBar>
+            <Search
+              placeholder="input search token"
+              onSearch={onSearch}
+              style={{ width: "40vw" }}
+            />
+            <Button type="primary" onClick={onNewPoolHandler}>
+              + New Pool
+            </Button>
+          </PoolControlBar>
+          <PoolTableContainer>
+            <Table
+              className="rounded-table"
+              columns={poolTableColumns}
+              dataSource={poolData}
+              onRow={(record) => ({
+                onClick: () => {
+                  if (record && record.key) showLPDetails(record.key);
+                },
+              })}
+            />
+          </PoolTableContainer>
+        </PoolContainer>
+      </PoolWrapper>
+      <CreateLPModal
+        isShow={showCreatePoolModal}
+        onClose={() => onCloseModal()}
+      />
+      <LPDetailModal
+        poolKey={activePoolKey}
+        poolData={poolData}
+        isShow={showLPDetailModal}
+        onClose={() => onCloseLPDetailModal()}
+      />
     </>
   );
 };
