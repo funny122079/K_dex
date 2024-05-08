@@ -38,7 +38,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [  
-  getItem('Tokens', '1', <img src="/assets/images/sidebar/nft.svg" draggable={false} alt="" width={16} height={16}  />),
+  getItem('Swap', '1', <img src="/assets/images/sidebar/nft.svg" draggable={false} alt="" width={16} height={16}  />),
   getItem('Pools', '2', <img src="/assets/images/sidebar/support.svg" draggable={false} alt="" width={16} height={16}  />),  
 ];
 
@@ -50,17 +50,17 @@ export const AppSidebar: React.FC = () => {
   };
 
   return (
-      <AppSidebarWrapper collapse={collapsed} >
+      <AppSidebarWrapper collapse={collapsed?'true':'false'} >
         <SearchWrapper>
-          <CollapseBtn onClick={toggleCollapsed} collapse={collapsed}>
+          <CollapseBtn onClick={toggleCollapsed} collapse={collapsed?'true':'false'}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </CollapseBtn>
-          <SearchBtn collapse={collapsed}>
+          <SearchBtn collapse={collapsed?'true':'false'}>
             <IoSearchOutline color="#91B760"/>
             <span>Search</span>
           </SearchBtn>
         </SearchWrapper>
-        <DexTitle collapse={collapsed}>K-DEX</DexTitle>
+        <DexTitle collapse={collapsed?'true':'false'}>K-DEX</DexTitle>
         <Menu
           defaultSelectedKeys={['']}
           mode="inline"

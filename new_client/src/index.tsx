@@ -1,12 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
-import WalletContextProvider from "./components/WalletContextProvider";
+import ReactDOM from "react-dom/client";
 
-ReactDOM.render(
-  <WalletContextProvider>
-    <App />
-  </WalletContextProvider>,
-  document.getElementById("root")
+import App from "./App";
+import "./polyfill";
+
+const root = ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement
 );
+root.render(<App />);

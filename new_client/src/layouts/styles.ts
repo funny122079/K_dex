@@ -76,9 +76,9 @@ export const FooterWrapper = styled.div`
   }
 `;
 
-export const AppSidebarWrapper = styled.div<{ collapse : boolean }>`
-  width: ${({collapse}) => collapse ? "92px" : "230px"};
-  min-width: ${({collapse}) => collapse ? "92px" : "230px"};
+export const AppSidebarWrapper = styled.div<{ collapse : string }>`
+  width: ${({collapse}) => collapse === 'true' ? "92px" : "230px"};
+  min-width: ${({collapse}) => collapse === 'true' ? "92px" : "230px"};
   align-items: flex-start;
   background: linear-gradient(180deg, #121724, #191f2d), linear-gradient(180deg, rgba(149, 161, 180, .15), rgba(1, 3, 20, .5) 20.69%, rgba(149, 161, 180, .15) 49.94%, rgba(1, 3, 20, .5) 81.52%, rgba(149, 161, 180, .15));
   background-clip: padding-box, border-box;
@@ -120,16 +120,16 @@ export const Content = styled.div`
   height: 100%;
   margin-top: 20px;
 `;
-export const CollapseBtn = styled.div<{ collapse : boolean }>`
+export const CollapseBtn = styled.div<{ collapse : string }>`
   background-color: #232B3D;
   border-radius: 8px;
-  height: ${({collapse}) => !collapse ? "30px" : "38px"};
-  width: ${({collapse}) => !collapse ? "30px" : "70px"};
+  height: ${({collapse}) => collapse !== 'true' ? "30px" : "38px"};
+  width: ${({collapse}) => collapse !== 'true' ? "30px" : "70px"};
   display: flex;
   justify-content: center;
   align-items: center;
   color: #91B760;
-  font-size: ${({collapse}) => !collapse ? "12px" : "15px"};
+  font-size: ${({collapse}) => collapse !== 'true' ? "12px" : "15px"};
   margin-left: 5px;
   cursor: pointer;
 `
@@ -137,7 +137,7 @@ export const SearchWrapper = styled.div`
   display: flex;
   margin-bottom: 5px;
 `
-export const SearchBtn = styled.div<{ collapse : boolean }>`
+export const SearchBtn = styled.div<{ collapse : string }>`
   width: 140px;
   align-items: center;
   background-clip: padding-box, border-box;
@@ -147,7 +147,7 @@ export const SearchBtn = styled.div<{ collapse : boolean }>`
   border-radius: 8px;
   color: #fff;
   cursor: pointer;
-  display: ${({collapse}) => collapse ? "none" : "flex" };
+  display: ${({collapse}) => collapse === 'true' ? "none" : "flex" };
   flex: 1;
   flex-direction: row;
   flex-wrap: wrap;
@@ -162,12 +162,12 @@ export const SearchBtn = styled.div<{ collapse : boolean }>`
     margin-left: 5px;
   }
 `
-export const DexTitle = styled.div<{ collapse : boolean }>`
+export const DexTitle = styled.div<{ collapse : string }>`
   color: #fff;
   font-size: 12px;
   font-weight: 500;
   margin: 15px 0 0px 5px;
-  display: ${({collapse}) => collapse && "none"};
+  display: ${({collapse}) => collapse === 'true' && "none"};
 `
 export const NavWrapper = styled.div`
   div {

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { type WalletName } from "@solana/wallet-adapter-base";
+import type { WalletName } from "@solana/wallet-adapter-base";
 
 import {
   WalletModalWrapper,
   WalletModalOverlay,
   WalletList,
   ListItem,
-  GoLoginText,
   CloseBtn,
   TitleContainer,
   TitleImageWrapper,
@@ -42,10 +41,10 @@ export const WalletModal: React.FC<SidebarProps> = ({ isShow, onClose }) => {
           <TitleSecondaryCaptionWrapper />
         </TitleContainer>
         <WalletList>
-          {wallets.map((wallet) => {
+          {wallets.map((wallet: any) => {
             if (
               connectList.filter(
-                (connectable) => wallet.adapter.name === connectable.label
+                (connectable: any) => wallet.adapter.name === connectable.label
               ).length > 0
             ) {
               if (
@@ -65,14 +64,17 @@ export const WalletModal: React.FC<SidebarProps> = ({ isShow, onClose }) => {
                 return (
                   <ListItem
                     key={wallet.adapter.name}
-                    onClick={() =>
+                    onClick={() => {
+                      console.log(
+                        `${wallet.adapter.name} is not supported in your environment`
+                      );
                       toast(
                         `${wallet.adapter.name} is not supported in your environment`,
                         {
                           theme: "dark",
                         }
-                      )
-                    }
+                      );
+                    }}
                   >
                     <img src={wallet.adapter.icon} alt="" draggable="false" />
                     {wallet.adapter.name}
@@ -106,13 +108,6 @@ export const WalletModal: React.FC<SidebarProps> = ({ isShow, onClose }) => {
             return null; // Default return value
           })}
         </WalletList>
-        <GoLoginText>
-          Already a user?
-          <p>
-            Login
-            <img src="/assets/images/direction.svg" alt="" draggable="false" />
-          </p>
-        </GoLoginText>
       </WalletModalWrapper>
       <WalletModalOverlay $isshow={isShow} onClick={onClose} />
     </>

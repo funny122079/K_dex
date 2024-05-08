@@ -21,6 +21,7 @@ export const Header: React.FC = () => {
   }
 
   const openWalletModal = () => {
+    console.log("open wallet!");
     setIsShow(true);
   }
 
@@ -33,15 +34,9 @@ export const Header: React.FC = () => {
       <HeaderNavWrapper>
         <div />
         <NavWrapper>
-          <div onClick={() => navigate('/')}>Tokens</div>
-          <div onClick={() => navigate('/')}>Pools</div>
+          <div>K-DEX</div>
         </NavWrapper>
-        <div>
-          {
-            publicKey? "": <MintBtn onClick={() => openWalletModal()}>
-              Sign up
-            </MintBtn>
-          }
+        <div>          
           <MintBtn onClick={() => !publicKey ? openWalletModal() : disconnect()} $bg={true}>
             <img src="/assets/wallet.png" alt=''/>
             {publicKey 

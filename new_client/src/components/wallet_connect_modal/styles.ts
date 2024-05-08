@@ -4,26 +4,26 @@ import logoPrimaryCaptionImg from "../../images/wallet_modal/primary_caption.png
 import logoSecondaryCaptionImg from "../../images/wallet_modal/secondary_caption.png";
 
 export const WalletModalWrapper = styled.div<{ $isshow: boolean }>`
-  max-width: 500px;
+  max-width: 50vw;
   position: fixed;
   background-clip: padding-box, border-box;
   background-image: #3C4765;
   background-origin: border-box;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 1vh;
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   z-index: 12;
-  padding: 20px 20px 30px 20px;
+  padding: 3vw 3vh 3vw 3vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   opacity: ${({ $isshow }) => ($isshow ? 1 : 0)};
   visibility: ${({ $isshow }) => ($isshow ? "visible" : "hidden")};
   .wallet-modal-logo {
-    width: 260px;
-    margin-top: 10px;
+    width: 25vw;
+    margin-top: 2vh;
   }
 `;
 export const WalletModalOverlay = styled.div<{ $isshow: boolean }>`
@@ -38,16 +38,16 @@ export const WalletModalOverlay = styled.div<{ $isshow: boolean }>`
   visibility: ${({ $isshow }) => ($isshow ? "visible" : "hidden")};
 `;
 export const WalletList = styled.div`
-  margin-top: 40px;
+  margin-top: 4vh;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  row-gap: 10px;
-  column-gap: 15px;
+  row-gap: 1vh;
+  column-gap: 1.5vh;
 `;
 export const ListItem = styled.div`
   color: #b7c6c9;
-  width: 215px;
-  height: 35px;
+  width: 20vw;
+  height: 10vh;
   display: flex;
   align-items: center;
   background-color: #191f2d;
@@ -58,25 +58,6 @@ export const ListItem = styled.div`
   img {
     width: 20px;
     margin-right: 15px;
-  }
-`;
-export const GoLoginText = styled.div`
-  display: flex;
-  color: #797e8b;
-  margin-top: 15px;
-  p {
-    display: flex;
-    color: #6ab257;
-    margin-left: 5px;
-    cursor: pointer;
-    img {
-      transform: rotate(180deg);
-      width: 14px;
-      margin-left: 5px;
-    }
-    &:hover {
-      text-decoration: underline;
-    }
   }
 `;
 
