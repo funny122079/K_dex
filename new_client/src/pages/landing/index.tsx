@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { SelectedMenuContext } from '../../context/SelectedMenuContext';
-// import { Pool } from '../';
+import { Pool } from '../Pool';
 // import { Swap } from '../';
 import {
   LandingPageWrapper,
@@ -21,8 +21,8 @@ export const Landing: React.FC = () => {
     >
       <AppLayout>
         <LandingPageWrapper id="home">
-          {/* {selectedMenuKey === "1" && <Swap />}
-          {selectedMenuKey === "2" && <Pool />} */}
+          {/* {selectedMenuKey === "1" && <Swap />} */}
+          {selectedMenuKey === "2" && <Pool />}
         </LandingPageWrapper>
       </AppLayout>
     </SelectedMenuContext.Provider>

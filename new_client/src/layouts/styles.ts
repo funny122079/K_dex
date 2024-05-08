@@ -31,9 +31,9 @@ export const HeaderNavWrapper = styled.div`
 
 export const MintButton = styled.div<{ $bg?: boolean }>`
   color: #fff;
-  width: ${({ $bg }) => !$bg && "100px" };
-  height: 40px;
-  padding: 10px;
+  width: ${({ $bg }) => !$bg && "13vw" };
+  height: 5vh;
+  padding: 1vw 1vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,8 +88,7 @@ export const AppSidebarWrapper = styled.div<{ collapse : string }>`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: calc(100vh - 112px);
-  max-height: calc(100vh - 112px);
+  height: 78vh;
   padding: 10px 0;
   overflow-y: scroll;
   & > .ant-menu {
