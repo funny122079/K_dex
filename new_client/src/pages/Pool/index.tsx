@@ -29,6 +29,9 @@ export interface PoolTableDataType {
   tvl: number;
   fee: string;
   contribution: string;
+  volume: number;
+  tokenNames: string[];
+  tokenWeights: number[];
   owner: boolean;
 }
 
@@ -39,14 +42,20 @@ const PoolData: PoolTableDataType[] = [
     tvl: 115.33,
     fee: "0.35%",
     contribution: "1.32 LP",
+    volume: 56.27,
+    tokenNames: ["SOL", "USDC"],
+    tokenWeights: [50, 50],
     owner: true,
   },
   {
     key: 2,
     pools: "(C98, USDC)",
     tvl: 585.14,
-    fee: "0.25%",
+    fee: "0.25%",    
     contribution: "0 LP",
+    volume: 230.13,
+    tokenNames: ["C98", "USDC"],
+    tokenWeights: [80, 20],
     owner: false,
   },
 ];
@@ -55,7 +64,17 @@ export const Pool: React.FC = () => {
   const [poolData, setPoolData] = useState(PoolData);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [showLPDetailModal, setShowLPDetailModal] = useState(false);
-  const [activePoolKey, setActivePoolKey] = useState(0);
+  const [activePoolData, setActivePoolData] = useState({  
+    key: 0,
+    pools: "",
+    tvl: 0,
+    fee: "",
+    contribution: "",
+    volume: 0,
+    tokenNames: ["",""],
+    tokenWeights: [50,50],
+    owner: false,
+  });
   const [headerItem, setHeaderItem] = useState([
     {
       icon: <MdSettings size={20} />,
@@ -146,7 +165,11 @@ export const Pool: React.FC = () => {
   };
 
   const showLPDetails = (LPKey: number) => {
-    setActivePoolKey(LPKey);
+    const poolDatabyKey = PoolData.find(data => data.key === LPKey);
+    if (poolDatabyKey !== undefined) {
+      setActivePoolData(poolDatabyKey);
+    }
+    
     setShowLPDetailModal(true);
   };
 
@@ -204,9 +227,8 @@ export const Pool: React.FC = () => {
         isShow={showCreatePoolModal}
         onClose={() => onCloseModal()}
       />
-      <LPDetailModal
-        poolKey={activePoolKey}
-        poolData={poolData}
+      <LPDetailModal        
+        poolData={activePoolData}
         isShow={showLPDetailModal}
         onClose={() => onCloseLPDetailModal()}
       />

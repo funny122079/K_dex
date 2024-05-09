@@ -1,7 +1,8 @@
 import { styled } from "styled-components";
 
 export const LPDetailModalWrapper = styled.div<{ $isshow: boolean }>`
-  width: 45vw;
+  width: 83vw;
+  height: 83vh;
   position: fixed;
   background-clip: padding-box, border-box;
   background-color: #ffffff;
@@ -41,4 +42,20 @@ export const CloseBtn = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
+`;
+
+export const LPOperationContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+
+  & > *:first-child {
+    margin-right: 0.5vw;
+  }
+`;
+
+export const CenterElements = styled.div`
+  display: flex;
+  justify-content: center;  
+  width: 100%;
+  height: 100%;
 `;
