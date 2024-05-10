@@ -10,6 +10,7 @@ export const PoolWrapper = styled.div`
   width: 77vw;
   height: 79vh;
 `;
+
 export const TitleContainer = styled.div`
   align-items: center;
   display: flex;

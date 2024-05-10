@@ -172,7 +172,7 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
           style={{
             width: "100%",
             alignItems: "center",
-            justifyContent: "center",
+            // justifyContent: "center",
           }}
         >
           <Col className="gutter-row" span={12}>
@@ -185,7 +185,7 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
               <Pie
                 data={weightGraphData}
                 options={options}
-                style={{ width: "23vw", height: "23vw" }}
+                style={{ width: "21vw", height: "21vw" }}
               />
             </CenterElements>
           </Col>
