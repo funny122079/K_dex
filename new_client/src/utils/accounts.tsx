@@ -305,7 +305,7 @@
 // //     cache
 // //       .getMint(connection, id)
 // //       .then(setMint)
-// //       .catch((err) => console.log("useMint-error", err.message));      
+// //       .catch((err) => console.log("useMint-error", err.message));
 // //     const onAccountEvent = (e: Event) => {
 // //       const event = e as AccountUpdateEvent;
 // //       if (event.id === id) {

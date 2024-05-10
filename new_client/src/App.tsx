@@ -3,16 +3,17 @@ import React from "react";
 import WalletContextProvider from "./components/WalletContextProvider";
 import { SPLTokenListProvider } from "context/SPLTokenListContext";
 import { CustomRoutes } from "./customRoutes";
+import { ConnectionProvider } from "utils/connection";
 
 function App() {
   return (
-    <div className="App">
+    <ConnectionProvider>
       <WalletContextProvider>
         <SPLTokenListProvider>
-          <CustomRoutes />      
-        </SPLTokenListProvider>  
+          <CustomRoutes />
+        </SPLTokenListProvider>
       </WalletContextProvider>
-    </div>
+    </ConnectionProvider>
   );
 }
 

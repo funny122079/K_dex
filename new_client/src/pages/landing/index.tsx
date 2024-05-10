@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SelectedMenuContext } from '../../context/SelectedMenuContext';
-import { Pool } from '../Pool';
-import { Swap } from '../Swap';
+import { Pool } from 'pages/Pool';
+import { Swap } from 'pages/Swap';
 import {
   LandingPageWrapper,
 } from "./styles";

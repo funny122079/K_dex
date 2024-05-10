@@ -3,8 +3,10 @@ import {
   clusterApiUrl,
 } from "@solana/web3.js";
 
+import { useLocalStorageState } from "./utils";
+import { setProgramIds } from "./ids";
+
 export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
-// export type ENV = "localnet";
 
 export const ENDPOINTS = [
   {
@@ -35,6 +37,38 @@ const ConnectionContext = React.createContext<ConnectionConfig>({
   env: ENDPOINTS[0].name,
 });
 
+export function ConnectionProvider({ children = undefined as any }) {
+  const [endpoint, setEndpoint] = useLocalStorageState(
+    "connectionEndpts",
+    ENDPOINTS[0].endpoint
+  );
+
+  const [slippage, setSlippage] = useLocalStorageState(
+    "slippage",
+    DEFAULT_SLIPPAGE.toString()
+  );
+
+  const env =
+    ENDPOINTS.find((end) => end.endpoint === endpoint)?.name ||
+    ENDPOINTS[0].name;
+
+  setProgramIds(env);
+
+  return (
+    <ConnectionContext.Provider
+      value={{
+        endpoint,
+        setEndpoint,
+        slippage: parseFloat(slippage),
+        setSlippage: (val) => setSlippage(val.toString()),
+        env,
+      }}
+    >
+      {children}
+    </ConnectionContext.Provider>
+  );
+};
+
 export function useConnectionConfig() {
   const context = useContext(ConnectionContext);
   return {
@@ -43,3 +77,8 @@ export function useConnectionConfig() {
     env: context.env,
   };
 }
+
+export function getEndpointName(endPoint: string) {
+  const endPointObject = ENDPOINTS.find((ep) => ep.endpoint === endPoint);
+  return endPointObject ? endPointObject.name : "";
+};
