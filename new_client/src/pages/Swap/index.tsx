@@ -128,6 +128,7 @@ export const Swap: React.FC = () => {
           text_attr_kinds="other_color"
           fonttype="Tiny"
           font_name="fantasy"
+          backgroundType={1}
         >
           {slippageTolerance} %
         </ColoredText>

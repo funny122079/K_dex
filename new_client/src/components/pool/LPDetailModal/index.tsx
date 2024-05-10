@@ -185,7 +185,7 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
               <Pie
                 data={weightGraphData}
                 options={options}
-                style={{ width: "21vw", height: "21vw" }}
+                style={{ width: "23vw", height: "23vw" }}
               />
             </CenterElements>
           </Col>

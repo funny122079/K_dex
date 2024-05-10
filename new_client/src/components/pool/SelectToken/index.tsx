@@ -1,68 +1,56 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Row, Col, Avatar, Button, Input, Popover, Modal, Radio } from "antd";
 import { PlusOutlined, CloseOutlined } from "@ant-design/icons";
+import { TokenInfo } from "@solana/spl-token-registry";
 
+import { SPLTokenListContext } from "context/SPLTokenListContext";
 import ColoredText from "components/typography/ColoredText";
 
 import { TokenWrapper, CaptionContainer } from "./styles";
 import { TokenSelectModal } from "../TokenSelectModal";
-interface Token {
-  symbol: string;
-  avatar: string;
-}
 
-const initialTokens: Token[] = [
-  { symbol: "TOKN", avatar: "" },
-  { symbol: "TOKN", avatar: "" },
-];
+const cellStyle: React.CSSProperties = {
+  padding: "8px 0",
+  height: "fit-content",
+};
 
-const tokensList: Token[] = [
-  { symbol: "BTC", avatar: "https://example.com/btc.png" },
-  { symbol: "ETH", avatar: "https://example.com/eth.png" },
-  //...
-];
+const initialTokenAddressList: string[] = ["", ""];
 
 export const SelectToken: React.FC = () => {
-  const [tokens, setTokens] = useState(initialTokens);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [tokenIndex, setTokenIndex] = useState<number | null>(null);
-    const [isShow, setIsShow] = useState(false);
+  const { tokenList } = useContext(SPLTokenListContext);
+  const [mintAddresss, setMintAddresss] = useState(initialTokenAddressList);
+  const [activeTokenIndex, setActiveTokenIndex] = useState<number>(0);
+  const [isShow, setIsShow] = useState(false);
 
   const handleAddToken = () => {
-    const newToken: Token = tokensList[tokenIndex!] || {
-      symbol: "New Token",
-      avatar: "https://example.com/new.png",
-    };
-    setTokens((prev) => [...prev, newToken]);
-    setTokenIndex(null);
+    setMintAddresss((prev) => [...prev, ""]);
   };
 
   const handleRemoveToken = (index: number) => {
-    setTokens((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const cellStyle: React.CSSProperties = {
-    padding: "8px 0",
-    height: "fit-content",
+    setMintAddresss((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onCloseModal = () => {
     setIsShow(false);
   };
 
-  const renderRow = (token: Token, index: number) => {
-    console.log(`${token.symbol} and index:${index}`);
+  const renderRow = (mintAddress: string, index: number) => {
+    console.log(`${mintAddress} and index:${index}`);
+    const tokenInfo = tokenList.get(mintAddress);
     return (
       <>
         <Col className="gutter-row" span={3}>
           <div style={cellStyle}>
-            <Avatar src={token.avatar} />
+            {tokenInfo?(<Avatar src={tokenInfo.logoURI} />):(<Avatar />)}
           </div>
         </Col>
         <Col className="gutter-row" span={5}>
           <div style={cellStyle}>
-            <Button type="text" onClick={() => setIsShow(true)}>
-              {token.symbol}
+            <Button type="text" onClick={() => {
+              setActiveTokenIndex(index);
+              setIsShow(true);              
+            }}>
+              {tokenInfo?tokenInfo.symbol:"TOKN"}
             </Button>
           </div>
         </Col>
@@ -102,12 +90,12 @@ export const SelectToken: React.FC = () => {
             </ColoredText>
           </div>
         </Col>
-        {tokens.map(renderRow)}
+        {mintAddresss.map(renderRow)}
       </Row>
       <Popover content="New Token">
         <Button icon={<PlusOutlined />} onClick={handleAddToken} />
       </Popover>
-      <TokenSelectModal isShow={isShow} onClose={() => onCloseModal()}  />
+      <TokenSelectModal isShow={isShow} tokenIndex={activeTokenIndex} mintAddrList={mintAddresss} onSelectToken={setMintAddresss} onClose={() => onCloseModal()} />
     </TokenWrapper>
   );
 };

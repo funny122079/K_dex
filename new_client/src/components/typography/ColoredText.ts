@@ -7,9 +7,10 @@ type ColoredTextProps = {
   fonttype?: string;
   font_name?: string;
   semi_transparent?: string;
+  backgroundType?: number;
 };
 
-const ColoredText = styled.span<ColoredTextProps>`
+const ColoredText = styled.span<ColoredTextProps>`  
   color: ${(props) => {
     if (props.text_attr_kinds === 'other_color') {
       return "#FFFFFFFF";
@@ -22,6 +23,14 @@ const ColoredText = styled.span<ColoredTextProps>`
     }
   }};
   font-weight: ${(props) => (props.emphazised === 'bold' ? "bold" : "normal")};
+
+  ${(props) =>
+    props.backgroundType == 1 &&
+    css`
+    background-color: rgb(32, 197, 14);
+    border-radius: 0.8vw;
+    width: 4vw;
+    `}
 
   ${(props) =>
     props.fonttype === "tinytiny" &&

@@ -1,5 +1,11 @@
 import { styled } from "styled-components";
 
+export const TokensContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;  
+`;
+
 export const TokenSelectModalWrapper = styled.div<{ $isshow: boolean }>`
   width: 45vw;
   position: fixed;

@@ -85,7 +85,7 @@ export const CurrencyInput = (props: {
           />
         </CurrencyInputHeaderRight>
       </CurrencyInputHeader>
-      <TokenSelectModal isShow={isShow} onClose={() => onCloseModal()} />
+      {/* <TokenSelectModal isShow={isShow} onClose={() => onCloseModal()} /> */}
     </CurrencyInputCardWrapper>
   );
 };

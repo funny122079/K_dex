@@ -1,15 +1,18 @@
 import React, { useContext, useEffect, useMemo } from "react";
+import {
+  clusterApiUrl,
+} from "@solana/web3.js";
 
-// export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
-export type ENV = "localnet";
+export type ENV = "mainnet-beta" | "testnet" | "devnet" | "localnet";
+// export type ENV = "localnet";
 
 export const ENDPOINTS = [
-  // {
-  //   name: "mainnet-beta" as ENV,
-  //   endpoint: "https://solana-api.projectserum.com/",
-  // },
-  // { name: "testnet" as ENV, endpoint: clusterApiUrl("testnet") },
-  // { name: "devnet" as ENV, endpoint: clusterApiUrl("devnet") },
+  {
+    name: "mainnet-beta" as ENV,
+    endpoint: clusterApiUrl("mainnet-beta"),
+  },
+  { name: "testnet" as ENV, endpoint: clusterApiUrl("testnet") },
+  { name: "devnet" as ENV, endpoint: clusterApiUrl("devnet") },
   { name: "localnet" as ENV, endpoint: "http://127.0.0.1:8899" },
 ];
 
