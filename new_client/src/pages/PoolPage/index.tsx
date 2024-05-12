@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { MdSettings, MdHelp } from "react-icons/md";
+import React, { useContext, useEffect, useState } from "react";
+import { PublicKey } from "@solana/web3.js";
 import { useConnection } from "@solana/wallet-adapter-react";
 
 import type { SearchProps } from "antd/es/input/Search";
@@ -18,11 +18,11 @@ import {
   TitleContainer,
 } from "./styles";
 
+import { SPLTokenListContext } from "context/SPLTokenListContext";
 import ColoredText from "../../components/typography/ColoredText";
 import { CreateLPModal } from "../../components/pool/CreateLPModal";
 import { LPDetailModal } from "../../components/pool/LPDetailModal";
 import { usePools } from "utils/pools";
-import { getTokenName } from "utils/utils";
 
 const { Search } = Input;
 
@@ -33,7 +33,8 @@ export interface PoolTableDataType {
   fee: string;
   contribution: string;
   volume: number;
-  mintAddres
+  mintAddresses: PublicKey[];
+  tokenNames: string[];
   tokenWeights: number[];
   owner: boolean;
 }
@@ -65,6 +66,7 @@ export interface PoolTableDataType {
 
 export const PoolPage: React.FC = () => {
   const { connection } = useConnection();
+  const { tokenList } = useContext(SPLTokenListContext);  
   const { pools } = usePools(connection);  
   const [poolData, setPoolData] = useState<PoolTableDataType[]>([]);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
@@ -76,10 +78,20 @@ export const PoolPage: React.FC = () => {
     fee: "",
     contribution: "",
     volume: 0,
-    mintAddresses: ["",""],
-    tokenWeights: [50,50],
+    mintAddresses: [],
+    tokenNames: [],
+  tokenWeights: [],
     owner: false,
   });
+
+  const getTokenName = (mintAddress: string): string => {    
+    const knownSymbol = tokenList.get(mintAddress)?.symbol;
+    if (knownSymbol) {
+      return knownSymbol;
+    }
+  
+    return "UNK_TOKN";
+  }
 
   useEffect(() => {
     const data:PoolTableDataType[] = pools.map((pool, index) => {
@@ -100,8 +112,9 @@ export const PoolPage: React.FC = () => {
         fee: fee,
         contribution: contribution,
         volume: 0,
-        tokenWeights: [],
         mintAddresses: pool.pubkeys.holdingMints,
+        tokenNames: [],
+        tokenWeights: [],
         owner: false, //temp
       };
     });
@@ -172,7 +185,7 @@ export const PoolPage: React.FC = () => {
   };
 
   const showLPDetails = (LPKey: number) => {
-    const poolDatabyKey = PoolData.find(data => data.key === LPKey);
+    const poolDatabyKey = poolData.find(data => data.key === (LPKey - 1));
     if (poolDatabyKey !== undefined) {
       setActivePoolData(poolDatabyKey);
     }

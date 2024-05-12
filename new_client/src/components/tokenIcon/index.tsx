@@ -1,6 +1,6 @@
 import { Identicon } from "./../identicon";
 import React from "react";
-import { getTokenIcon } from "../../utils/utils";
+import { useTokenIcon } from "../../utils/utils";
 import { useConnectionConfig } from "../../utils/connection";
 
 export const TokenIcon = (props: {
@@ -8,7 +8,7 @@ export const TokenIcon = (props: {
   style?: React.CSSProperties;
 }) => {
   const { env } = useConnectionConfig();
-  const icon = getTokenIcon(env, props.mintAddress);
+  const icon = useTokenIcon(props.mintAddress);
 
   if (icon) {
     return (

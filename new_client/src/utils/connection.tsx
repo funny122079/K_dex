@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from "react";
+import React, { useContext } from "react";
 import {
   clusterApiUrl,
 } from "@solana/web3.js";

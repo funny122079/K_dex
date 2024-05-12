@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Popover } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 

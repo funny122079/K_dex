@@ -29,7 +29,7 @@ export function useLocalStorageState(key: string, defaultState?: string) {
   return [state, setLocalStorageState];
 }
 
-export function getTokenIcon(  
+export function useTokenIcon(  
   mintAddress: string
 ): string {
   const { tokenList } = useContext(SPLTokenListContext);
@@ -40,14 +40,4 @@ export function getTokenIcon(
   }
 
   return "";
-}
-
-export function getTokenName(mintAddress: string): string {
-  const { tokenList } = useContext(SPLTokenListContext);  
-  const knownSymbol = tokenList.get(mintAddress)?.symbol;
-  if (knownSymbol) {
-    return knownSymbol;
-  }
-
-  return "UNK_TOKN";
 }

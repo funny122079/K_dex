@@ -109,7 +109,7 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
         <Row style={{ width: "100%", marginBottom: "3vh" }}>
           <Col className="gutter-row" span={4}>
             <ColoredText fonttype="small" font_name="fantasy">
-              {poolData.pools}
+              {poolData.poolName}
             </ColoredText>
           </Col>
           <Col className="gutter-row" span={14}></Col>
