@@ -1,29 +1,8 @@
-import { useCallback, useState } from "react";
-import PopularTokens from "./token-list.json";
-import { ENV } from "./connection";
-
-export interface KnownToken {
-  tokenSymbol: string;
-  tokenName: string;
-  icon: string;
-  mintAddress: string;
-}
-
-const AddressToToken = Object.keys(PopularTokens).reduce((map, key) => {
-  const tokens = PopularTokens[key as ENV] as KnownToken[];
-  const knownMints = tokens.reduce((map, item) => {
-    map.set(item.mintAddress, item);
-    return map;
-  }, new Map<string, KnownToken>());
-
-  map.set(key as ENV, knownMints);
-
-  return map;
-}, new Map<ENV, Map<string, KnownToken>>());
+import { useContext, useCallback, useState } from "react";
+import { SPLTokenListContext } from "context/SPLTokenListContext";
 
 export function useLocalStorageState(key: string, defaultState?: string) {
   const [state, setState] = useState(() => {
-    // NOTE: Not sure if this is ok
     const storedState = localStorage.getItem(key);
     if (storedState) {
       return JSON.parse(storedState);
@@ -50,9 +29,25 @@ export function useLocalStorageState(key: string, defaultState?: string) {
   return [state, setLocalStorageState];
 }
 
-export function getTokenIcon(
-  env: ENV,
+export function getTokenIcon(  
   mintAddress: string
-): string | undefined {
-  return AddressToToken.get(env)?.get(mintAddress)?.icon;
+): string {
+  const { tokenList } = useContext(SPLTokenListContext);
+
+  const tokenIconURI = tokenList.get(mintAddress)?.logoURI;
+  if (tokenIconURI) {
+    return tokenIconURI;
+  }
+
+  return "";
+}
+
+export function getTokenName(mintAddress: string): string {
+  const { tokenList } = useContext(SPLTokenListContext);  
+  const knownSymbol = tokenList.get(mintAddress)?.symbol;
+  if (knownSymbol) {
+    return knownSymbol;
+  }
+
+  return "UNK_TOKN";
 }

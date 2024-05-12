@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, message, Steps, theme } from 'antd';
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { SelectToken } from '../SelectToken';
 import { SetLiquidity } from '../SetLiquidity';
+import { checkTokenBalance } from 'utils/walletUtil';
 import {
   CreateLPModalWrapper,
   CreateLPModalOverlay,
@@ -32,15 +34,23 @@ const createLPSteps = [
 ];
 
 export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
+  const { connection } = useConnection();
+  const { publicKey } = useWallet();
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
 
   const next = () => {
-    setCurrent(current + 1);
-  };
+    switch (current) {
+      case 0:
+        checkTokenBalance(connection, , publicKey);
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+    }
 
-  const prev = () => {
-    setCurrent(current - 1);
+    setCurrent(current + 1);
   };
 
   const items = createLPSteps.map((item) => ({ key: item.title, title: item.title }));

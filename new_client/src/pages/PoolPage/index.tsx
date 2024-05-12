@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MdSettings, MdHelp } from "react-icons/md";
+import { useConnection } from "@solana/wallet-adapter-react";
 
 import type { SearchProps } from "antd/es/input/Search";
 import { Button, Checkbox, Input, Table } from "antd";
@@ -20,71 +21,93 @@ import {
 import ColoredText from "../../components/typography/ColoredText";
 import { CreateLPModal } from "../../components/pool/CreateLPModal";
 import { LPDetailModal } from "../../components/pool/LPDetailModal";
+import { usePools } from "utils/pools";
+import { getTokenName } from "utils/utils";
 
 const { Search } = Input;
 
 export interface PoolTableDataType {
   key: number;
-  pools: string;
+  poolName: string;
   tvl: number;
   fee: string;
   contribution: string;
   volume: number;
-  tokenNames: string[];
+  mintAddres
   tokenWeights: number[];
   owner: boolean;
 }
 
-const PoolData: PoolTableDataType[] = [
-  {
-    key: 1,
-    pools: "(SOL, USDC)",
-    tvl: 115.33,
-    fee: "0.35%",
-    contribution: "1.32 LP",
-    volume: 56.27,
-    tokenNames: ["SOL", "USDC"],
-    tokenWeights: [50, 50],
-    owner: true,
-  },
-  {
-    key: 2,
-    pools: "(C98, USDC)",
-    tvl: 585.14,
-    fee: "0.25%",    
-    contribution: "0 LP",
-    volume: 230.13,
-    tokenNames: ["C98", "USDC"],
-    tokenWeights: [80, 20],
-    owner: false,
-  },
-];
+// const PoolData: PoolTableDataType[] = [
+//   {
+//     key: 1,
+//     poolName: "(SOL, USDC)",
+//     tvl: 115.33,
+//     fee: "0.35%",
+//     contribution: "1.32 LP",
+//     volume: 56.27,
+//     tokenNames: ["SOL", "USDC"],
+//     tokenWeights: [50, 50],
+//     owner: true,
+//   },
+//   {
+//     key: 2,
+//     poolName: "(C98, USDC)",
+//     tvl: 585.14,
+//     fee: "0.25%",    
+//     contribution: "0 LP",
+//     volume: 230.13,
+//     tokenNames: ["C98", "USDC"],
+//     tokenWeights: [80, 20],
+//     owner: false,
+//   },
+// ];
 
 export const PoolPage: React.FC = () => {
-  const [poolData, setPoolData] = useState(PoolData);
+  const { connection } = useConnection();
+  const { pools } = usePools(connection);  
+  const [poolData, setPoolData] = useState<PoolTableDataType[]>([]);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [showLPDetailModal, setShowLPDetailModal] = useState(false);
-  const [activePoolData, setActivePoolData] = useState({  
+  const [activePoolData, setActivePoolData] = useState<PoolTableDataType>({  
     key: 0,
-    pools: "",
+    poolName: "",
     tvl: 0,
     fee: "",
     contribution: "",
     volume: 0,
-    tokenNames: ["",""],
+    mintAddresses: ["",""],
     tokenWeights: [50,50],
     owner: false,
   });
-  const [headerItem, setHeaderItem] = useState([
-    {
-      icon: <MdSettings size={20} />,
-      label: "Preferences",
-    },
-    {
-      icon: <MdHelp size={20} />,
-      label: "Help",
-    },
-  ]);
+
+  useEffect(() => {
+    const data:PoolTableDataType[] = pools.map((pool, index) => {
+      // these are placeholders, replace with actual calculation
+      // const tvl = calculateTVL(pool);
+      // const fee = calculateFee(pool);
+      // const contribution = calculateContribution(pool);
+      const tvl = 0;
+      const fee = "";
+      const contribution = "";      
+      
+      const tokenNames: string[] = pool.pubkeys.holdingMints.map(mintAddress => getTokenName(mintAddress.toString()));
+      
+      return {
+        key: index,
+        poolName: tokenNames.join(','),
+        tvl: tvl,
+        fee: fee,
+        contribution: contribution,
+        volume: 0,
+        tokenWeights: [],
+        mintAddresses: pool.pubkeys.holdingMints,
+        owner: false, //temp
+      };
+    });
+  
+    setPoolData(data);
+  }, [pools]);
 
   const poolTableColumns: TableProps<PoolTableDataType>["columns"] = [
     {
@@ -94,9 +117,8 @@ export const PoolPage: React.FC = () => {
     },
     {
       title: "POOLS",
-      dataIndex: "pools",
+      dataIndex: "poolName",
       key: "pools",
-      //   render: (text) => <a>{text}</a>,
     },
     {
       title: "TVL",
@@ -112,21 +134,6 @@ export const PoolPage: React.FC = () => {
       title: "My Contribution",
       key: "contribution",
       dataIndex: "contribution",
-      //   render: (_, { tags }) => (
-      //     <>
-      //       {tags.map((tag) => {
-      //         let color = tag.length > 5 ? 'geekblue' : 'green';
-      //         if (tag === 'loser') {
-      //           color = 'volcano';
-      //         }
-      //         return (
-      //           <Tag color={color} key={tag}>
-      //             {tag.toUpperCase()}
-      //           </Tag>
-      //         );
-      //       })}
-      //     </>
-      //   ),
     },
     {
       title: "Owner",
@@ -187,16 +194,7 @@ export const PoolPage: React.FC = () => {
               Liquidity Pool
             </ColoredText>
           </TitleContainer>
-          <PoolHeaderSection>
-            <div className="room-header-setting">
-              {headerItem.map((item) => (
-                <p key={item.label}>
-                  {item.icon}
-                  <span>{item.label}</span>
-                </p>
-              ))}
-            </div>
-          </PoolHeaderSection>
+          <PoolHeaderSection></PoolHeaderSection>
         </PoolHeader>
         <PoolContainer>
           <PoolControlBar>

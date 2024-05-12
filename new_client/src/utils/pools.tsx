@@ -1,12 +1,12 @@
-// import {
-//     Account,
-//     Connection,
-//     PublicKey,
-//     SystemProgram,
-//     TransactionInstruction,
-//   } from "@solana/web3.js";
+import {
+  //     Account,
+  Connection,
+  PublicKey,
+  //     SystemProgram,
+  //     TransactionInstruction,
+} from "@solana/web3.js";
 //   import { sendTransaction, useConnection } from "./connection";
-//   import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 //   import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
 //   import { notify } from "./notifications";
 //   import {
@@ -15,24 +15,24 @@
 //     useUserAccounts,
 //     useCachedPool,
 //   } from "./accounts";
-//   import {
-//     programIds,
-//     SWAP_HOST_FEE_ADDRESS,
-//     SWAP_PROGRAM_OWNER_FEE_ADDRESS,
-//     WRAPPED_SOL_MINT,
-//   } from "./ids";
-//   import {
-//     LiquidityComponent,
-//     PoolInfo,
-//     TokenAccount,
-//     createInitSwapInstruction,
-//     TokenSwapLayout,
-//     depositInstruction,
-//     withdrawInstruction,
-//     TokenSwapLayoutLegacyV0,
-//     swapInstruction,
-//     PoolConfig,
-//   } from "./../models";
+import {
+  programIds,
+  //     SWAP_HOST_FEE_ADDRESS,
+  //     SWAP_PROGRAM_OWNER_FEE_ADDRESS,
+  //     WRAPPED_SOL_MINT,
+} from "./ids";
+import {
+  //     LiquidityComponent,
+  PoolInfo,
+  //     TokenAccount,
+  //     createInitSwapInstruction,
+  TokenSwapLayout,
+  //     depositInstruction,
+  //     withdrawInstruction,
+  //     TokenSwapLayoutLegacyV0,
+  //     swapInstruction,
+  //     PoolConfig,
+} from "./../models";
 
 //   const LIQUIDITY_TOKEN_PRECISION = 8;
 
@@ -298,182 +298,142 @@
 //     );
 //   };
 
-//   const toPoolInfo = (item: any, program: PublicKey, toMerge?: PoolInfo) => {
-//     const mint = new PublicKey(item.data.tokenPool);
-//     return {
-//       pubkeys: {
-//         account: item.pubkey,
-//         program: program,
-//         mint,
-//         holdingMints: [] as PublicKey[],
-//         holdingAccounts: [item.data.tokenAccountA, item.data.tokenAccountB].map(
-//           (a) => new PublicKey(a)
-//         ),
-//       },
-//       legacy: false,
-//       raw: item,
-//     } as PoolInfo;
-//   };
+//item: typeof TokenSwapLayout
+const toPoolInfo = (item: any, program: PublicKey, toMerge?: PoolInfo) => {
+  const mint = new PublicKey(item.data.tokenPool);
+  return {
+    pubkeys: {
+      account: item.pubkey,
+      program: program,
+      mint,
+      holdingMints: [] as PublicKey[],
+      holdingAccounts: [item.data.tokenAccounts].map((a) => new PublicKey(a)),
+    },
+    raw: item,
+  } as PoolInfo;
+};
 
-//   export const usePools = () => {
-//     const connection = useConnection();
-//     const [pools, setPools] = useState<PoolInfo[]>([]);
+export const usePools = (connection: Connection) => {
+  const [pools, setPools] = useState<PoolInfo[]>([]);
 
-//     // initial query
-//     useEffect(() => {
-//       setPools([]);
+  // initial query
+  useEffect(() => {
+    setPools([]);
 
-//       const queryPools = async (swapId: PublicKey, isLegacy = false) => {
-//         let poolsArray: PoolInfo[] = [];
-//         (await connection.getProgramAccounts(swapId))
-//           .filter(
-//             (item) =>
-//               item.account.data.length === TokenSwapLayout.span ||
-//               item.account.data.length === TokenSwapLayoutLegacyV0.span
-//           )
-//           .map((item) => {
-//             let result = {
-//               data: undefined as any,
-//               account: item.account,
-//               pubkey: item.pubkey,
-//               init: async () => {},
-//             };
+    const queryPools = async (swapId: PublicKey) => {
+      let poolsArray: PoolInfo[] = [];
+      (await connection.getProgramAccounts(swapId))
+        .filter((item) => item.account.data.length === TokenSwapLayout.span)
+        .map((item) => {
+          let result = {
+            data: undefined as any,
+            account: item.account,
+            pubkey: item.pubkey,
+            init: async () => {},
+          };
 
-//             // handling of legacy layout can be removed soon...
-//             if (item.account.data.length === TokenSwapLayoutLegacyV0.span) {
-//               result.data = TokenSwapLayoutLegacyV0.decode(item.account.data);
-//               let pool = toPoolInfo(result, swapId);
-//               pool.legacy = isLegacy;
-//               poolsArray.push(pool as PoolInfo);
+          result.data = TokenSwapLayout.decode(item.account.data);
+          let pool = toPoolInfo(result, swapId);
+          pool.pubkeys.feeAccount = new PublicKey(result.data.feeAccount);
+          pool.pubkeys.holdingMints = result.data.mints.map(
+            (buffer: any) => new PublicKey(buffer)
+          );
 
-//               result.init = async () => {
-//                 try {
-//                   // TODO: this is not great
-//                   // Ideally SwapLayout stores hash of all the mints to make finding of pool for a pair easier
-//                   const holdings = await Promise.all(
-//                     getHoldings(connection, [
-//                       result.data.tokenAccountA,
-//                       result.data.tokenAccountB,
-//                     ])
-//                   );
+          poolsArray.push(pool as PoolInfo);
 
-//                   pool.pubkeys.holdingMints = [
-//                     holdings[0].info.mint,
-//                     holdings[1].info.mint,
-//                   ] as PublicKey[];
-//                 } catch (err) {
-//                   console.log(err);
-//                 }
-//               };
-//             } else {
-//               result.data = TokenSwapLayout.decode(item.account.data);
-//               let pool = toPoolInfo(result, swapId);
-//               pool.legacy = isLegacy;
-//               pool.pubkeys.feeAccount = new PublicKey(result.data.feeAccount);
-//               pool.pubkeys.holdingMints = [
-//                 new PublicKey(result.data.mintA),
-//                 new PublicKey(result.data.mintB),
-//               ] as PublicKey[];
+          return result;
+        });
 
-//               poolsArray.push(pool as PoolInfo);
-//             }
+      return poolsArray;
+    };
 
-//             return result;
-//           });
+    Promise.all([queryPools(programIds().swap)]).then((all) => {
+      const flattenPoolList = all.reduce((acc, val) => acc.concat(val), []);
+      setPools(flattenPoolList);
+    });
+  }, [connection]);
 
-//         return poolsArray;
-//       };
+  useEffect(() => {
+    const subID = connection.onProgramAccountChange(
+      programIds().swap,
+      async (info) => {
+        const id = info.accountId as unknown as string;
+        if (info.accountInfo.data.length === TokenSwapLayout.span) {
+          const account = info.accountInfo;
+          const updated = {
+            data: TokenSwapLayout.decode(account.data),
+            account: account,
+            pubkey: new PublicKey(id),
+          };
 
-//       Promise.all([
-//         queryPools(programIds().swap),
-//         ...programIds().swap_legacy.map((leg) => queryPools(leg, true)),
-//       ]).then((all) => {
-//         setPools(all.flat());
-//       });
-//     }, [connection]);
+          const index =
+            pools &&
+            pools.findIndex((p) => p.pubkeys.account.toBase58() === id);
+          if (index && index >= 0 && pools) {
+            const filtered = pools.filter((p, i) => i !== index);
+            setPools([...filtered, toPoolInfo(updated, programIds().swap)]);
+          } else {
+            let pool = toPoolInfo(updated, programIds().swap);
 
-//     useEffect(() => {
-//       const subID = connection.onProgramAccountChange(
-//         programIds().swap,
-//         async (info) => {
-//           const id = (info.accountId as unknown) as string;
-//           if (info.accountInfo.data.length === TokenSwapLayout.span) {
-//             const account = info.accountInfo;
-//             const updated = {
-//               data: TokenSwapLayout.decode(account.data),
-//               account: account,
-//               pubkey: new PublicKey(id),
-//             };
+            pool.pubkeys.feeAccount = new PublicKey(updated.data.feeAccount);
+            pool.pubkeys.holdingMints = updated.data.mints.map(
+              (buffer: any) => new PublicKey(buffer)
+            );
 
-//             const index =
-//               pools &&
-//               pools.findIndex((p) => p.pubkeys.account.toBase58() === id);
-//             if (index && index >= 0 && pools) {
-//               // TODO: check if account is empty?
+            setPools([...pools, pool]);
+          }
+        }
+      },
+      "singleGossip"
+    );
 
-//               const filtered = pools.filter((p, i) => i !== index);
-//               setPools([...filtered, toPoolInfo(updated, programIds().swap)]);
-//             } else {
-//               let pool = toPoolInfo(updated, programIds().swap);
+    return () => {
+      connection.removeProgramAccountChangeListener(subID);
+    };
+  }, [connection, pools]);
 
-//               pool.pubkeys.feeAccount = new PublicKey(updated.data.feeAccount);
-//               pool.pubkeys.holdingMints = [
-//                 new PublicKey(updated.data.mintA),
-//                 new PublicKey(updated.data.mintB),
-//               ] as PublicKey[];
+  return { pools };
+};
 
-//               setPools([...pools, pool]);
-//             }
-//           }
-//         },
-//         "singleGossip"
-//       );
+// export const usePoolForBasket = (
+//   connection: Connection,
+//   mints: (string | undefined)[]
+// ) => {
+//   const { pools } = useCachedPool();
+//   const [pool, setPool] = useState<PoolInfo>();
+//   const sortedMints = [...mints].sort();
+//   useEffect(() => {
+//     (async () => {
+//       // reset pool during query
+//       setPool(undefined);
 
-//       return () => {
-//         connection.removeProgramAccountChangeListener(subID);
-//       };
-//     }, [connection, pools]);
+//       let matchingPool = pools
+//         .filter((p) => !p.legacy)
+//         .filter((p) =>
+//           p.pubkeys.holdingMints
+//             .map((a) => a.toBase58())
+//             .sort()
+//             .every((address, i) => address === sortedMints[i])
+//         );
 
-//     return { pools };
-//   };
+//       for (let i = 0; i < matchingPool.length; i++) {
+//         const p = matchingPool[i];
 
-//   export const usePoolForBasket = (mints: (string | undefined)[]) => {
-//     const connection = useConnection();
-//     const { pools } = useCachedPool();
-//     const [pool, setPool] = useState<PoolInfo>();
-//     const sortedMints = [...mints].sort();
-//     useEffect(() => {
-//       (async () => {
-//         // reset pool during query
-//         setPool(undefined);
+//         const account = await cache.getAccount(
+//           connection,
+//           p.pubkeys.holdingAccounts[0]
+//         );
 
-//         let matchingPool = pools
-//           .filter((p) => !p.legacy)
-//           .filter((p) =>
-//             p.pubkeys.holdingMints
-//               .map((a) => a.toBase58())
-//               .sort()
-//               .every((address, i) => address === sortedMints[i])
-//           );
-
-//         for (let i = 0; i < matchingPool.length; i++) {
-//           const p = matchingPool[i];
-
-//           const account = await cache.getAccount(
-//             connection,
-//             p.pubkeys.holdingAccounts[0]
-//           );
-
-//           if (!account.info.amount.eqn(0)) {
-//             setPool(p);
-//             return;
-//           }
+//         if (!account.info.amount.eqn(0)) {
+//           setPool(p);
+//           return;
 //         }
-//       })();
-//     }, [connection, ...sortedMints, pools]);
+//       }
+//     })();
+//   }, [connection, ...sortedMints, pools]);
 
-//     return pool;
-//   };
+//   return pool;
+// };
 
 //   export const useOwnedPools = () => {
 //     const { pools } = useCachedPool();

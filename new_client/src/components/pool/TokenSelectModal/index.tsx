@@ -131,7 +131,7 @@ export const TokenSelectModal: React.FC<TokenSelectLPProps> = ({
               onClick={() =>
                 onSelectTokenHandler(address, logoURI ? logoURI : "")
               }
-              style={{ display: "flex", alignItems: "center", marginBottom: '1vh' }}
+              style={{ display: "flex", alignItems: "center", marginBottom: '2vh' }}
             >
               <Avatar src={logoURI} size={40} />
               <TokenLabelContainer>

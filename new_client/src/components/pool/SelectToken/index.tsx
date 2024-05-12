@@ -41,7 +41,7 @@ export const SelectToken: React.FC = () => {
       <Row key={index} style={{ width: "100%" }}>
         <Col className="gutter-row" span={3}>
           <div style={cellStyle}>
-            {tokenInfo?(<Avatar src={tokenInfo.logoURI} />):(<Avatar />)}
+            {tokenInfo?(<Avatar src={tokenInfo.logoURI} size={40} />):(<Avatar size={40} />)}
           </div>
         </Col>
         <Col className="gutter-row" span={5}>
