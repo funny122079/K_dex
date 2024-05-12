@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "chart.js";
 
-import { PoolTableDataType } from "../../../pages/Pool";
+import { PoolTableDataType } from "pages/PoolPage";
 import {
   LPDetailModalWrapper,
   LPDetailModalOverlay,

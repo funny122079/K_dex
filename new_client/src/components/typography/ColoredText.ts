@@ -75,12 +75,6 @@ const ColoredText = styled.span<ColoredTextProps>`
     `}
 
   ${(props) =>
-    props.font_name &&
-    css`
-      font-family: ${props.font_name};
-    `}
-
-  ${(props) =>
     props.semi_transparent==='1' &&
     css`
       opacity: 0.7;

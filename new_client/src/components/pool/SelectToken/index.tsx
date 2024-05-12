@@ -38,7 +38,7 @@ export const SelectToken: React.FC = () => {
     console.log(`${mintAddress} and index:${index}`);
     const tokenInfo = tokenList.get(mintAddress);
     return (
-      <>
+      <Row key={index} style={{ width: "100%" }}>
         <Col className="gutter-row" span={3}>
           <div style={cellStyle}>
             {tokenInfo?(<Avatar src={tokenInfo.logoURI} />):(<Avatar />)}
@@ -69,7 +69,7 @@ export const SelectToken: React.FC = () => {
             </Popover>
           </div>
         </Col>
-      </>
+      </Row>
     );
   };
 

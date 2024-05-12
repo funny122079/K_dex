@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, message, Steps, theme } from 'antd';
 
 import { SelectToken } from '../SelectToken';
+import { SetLiquidity } from '../SetLiquidity';
 import {
   CreateLPModalWrapper,
   CreateLPModalOverlay,
@@ -22,7 +23,7 @@ const createLPSteps = [
   },
   {
     title: 'Set liquidity',
-    content: 'Second-content',
+    content: <SetLiquidity />,
   },
   {
     title: 'Confirm',
