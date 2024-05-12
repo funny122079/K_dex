@@ -156,25 +156,25 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
         }
 
         if (publicKey) {
-          // if (
-          //   !(await checkTokenBalances(
-          //     connection,
-          //     mintAddresss,
-          //     tokenAmounts,
-          //     publicKey
-          //   ))
-          // ) {
-          //   toast(`Not sufficient balance in your wallet. Please, charge!`, {
-          //     theme: "dark",
-          //   });
-          //   return;
-          // }
+          if (
+            !(await checkTokenBalances(
+              connection,
+              mintAddresss,
+              tokenAmounts,
+              publicKey
+            ))
+          ) {
+            toast(`Not sufficient balance in your wallet. Please, charge!`, {
+              theme: "dark",
+            });
+            return;
+          }
         } else {
-          // toast(`Please, connect your wallet!`, {
-          //   theme: "dark",
-          // });
+          toast(`Please, connect your wallet!`, {
+            theme: "dark",
+          });
 
-          // return;
+          return;
         }
 
         break;
