@@ -11,7 +11,7 @@ import {
   CurrencyInputHeader,
   CurrencyInputHeaderLeft,
   CurrencyInputHeaderRight,
-} from "./styles";
+} from "components/CurrencyInput/styles";
 
 // import { PoolIcon, TokenIcon } from "../tokenIcon";
 // import { TokenAccount } from "../../models";
