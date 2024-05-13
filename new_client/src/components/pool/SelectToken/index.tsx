@@ -8,6 +8,7 @@ import ColoredText from "components/typography/ColoredText";
 
 import { TokenWrapper, CaptionContainer } from "./styles";
 import { TokenSelectModal } from "../TokenSelectModal";
+import { LIQUIDITY_TOKEN_PRECISION } from "utils/pools";
 
 const cellStyle: React.CSSProperties = {
   padding: "8px 0",
@@ -20,12 +21,10 @@ type SelectTokenProps = {
   addMintAddrList: (arg: string) => void;
   removeMintAddrList: (arg: number) => void;
   tokenAmountList: number[];
-  // setTokenAmountList: (index: number, value: number) => void;
   setTokenAmountList: (arg: number[]) => void;
   addTAmount: (arg: number) => void;
   removeTAmount: (arg: number) => void;
   tokenWeightList: number[];
-  // setTokenWeightList: (index: number, value: number) => void;
   setTokenWeightList: (arg: number[]) => void;
   addTWeight: (arg: number) => void;
   removeTWeight: (arg: number) => void;
@@ -41,7 +40,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
   tokenWeightList,
   setTokenWeightList,
   addTAmount,
-  removeTAmount,            
+  removeTAmount,
   addTWeight,
   removeTWeight,
 }) => {
@@ -57,24 +56,17 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
   };
 
   const handleAmountInput = (event: any, index: number) => {
-    tokenAmountList[index] = event?.target?.value;
-    setTokenAmountList(tokenAmountList);
+    let newTokenAmountList = [...tokenAmountList];
+    newTokenAmountList[index] = event?.target?.value;
+    setTokenAmountList(newTokenAmountList);
   };
 
   const handleWeightInput = (event: any, index: number) => {
-    event.persist();
-    const newTokenWeightList = [...tokenWeightList]; 
-    newTokenWeightList[index] = event?.target?.value;     
+    let newTokenWeightList = [...tokenWeightList];
+    newTokenWeightList[index] = event?.target?.value;
     setTokenWeightList(newTokenWeightList);
-    
-  // const newValue = Number(event.target.value);
-  // setTokenWeightList((prev:any[]) => {
-  //   const newTokenWeightList = [...prev];
-  //   newTokenWeightList[index] = newValue;
-  //   return newTokenWeightList;
-  // });
-  }
-  
+  };
+
   const handleRemoveToken = (index: number) => {
     removeMintAddrList(index);
     removeTAmount(index);
@@ -86,7 +78,6 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
   };
 
   const renderRow = (mintAddress: string, index: number) => {
-    console.log(`${mintAddress} and index:${index}`);
     const tokenInfo = tokenList.get(mintAddress);
     return (
       <Row key={index} style={{ width: "100%" }}>
@@ -117,7 +108,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
             {index == 0 && (
               <Input
                 placeholder="Amount"
-                // value={tokenAmountList[index]}
+                defaultValue={0}
                 onChange={(event) => {
                   handleAmountInput(event, index);
                 }}
@@ -129,7 +120,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
           <div style={cellStyle}>
             <Input
               placeholder="Weight"
-              // value={tokenWeightList[index]}
+              defaultValue={0}
               onChange={(event) => {
                 handleWeightInput(event, index);
               }}
@@ -140,6 +131,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
           <div style={cellStyle}>
             <Popover content="Remove">
               <Button
+                disabled={tokenWeightList.length <= 2}
                 icon={<DeleteOutlined />}
                 onClick={() => handleRemoveToken(index)}
               />
@@ -179,7 +171,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
         {mintAddrList.map(renderRow)}
       </Row>
       <Popover content="New Token">
-        <Button icon={<PlusOutlined />} onClick={handleAddToken} />
+        <Button icon={<PlusOutlined />} onClick={handleAddToken} disabled={tokenWeightList.length >= LIQUIDITY_TOKEN_PRECISION}>Select New Token</Button>
       </Popover>
       <TokenSelectModal
         isShow={isShow}

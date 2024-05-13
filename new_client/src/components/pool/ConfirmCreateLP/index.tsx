@@ -13,7 +13,7 @@ type ConfirmCreateLPProps = {
 };
 
 const cellStyle: React.CSSProperties = {
-  padding: "8px 0",
+  padding: "1vh 0",
   height: "fit-content",
 };
 
@@ -39,14 +39,14 @@ export const ConfirmCreateLP: React.FC<ConfirmCreateLPProps> = ({
         </Col>
         <Col className="gutter-row" span={7}>
           <div style={cellStyle}>
-            <ColoredText fonttype="Tiny" font_name="fantasy">
+            <ColoredText fonttype="semiSmallTiny" font_name="fantasy">
               {tokenInfo ? tokenInfo.symbol : "UNK_TOKN"}
             </ColoredText>
           </div>
         </Col>
         <Col className="gutter-row" span={12}>
           <div style={cellStyle}>
-            <ColoredText fonttype="Tiny" font_name="fantasy">
+            <ColoredText fonttype="semiSmallTiny" font_name="fantasy">
               {tokenAmountList[index]}
             </ColoredText>
           </div>
@@ -57,9 +57,9 @@ export const ConfirmCreateLP: React.FC<ConfirmCreateLPProps> = ({
 
   return (
     <ConfirmWrapper>
-      <Row style={{ width: "100%" }}>
+      <Row style={{ width: "100%", marginTop: '3vh' }}>
         <Col className="gutter-row" span={24}>
-          <ColoredText fonttype="semiMidTiny" font_name="fantasy">
+          <ColoredText fonttype="semiTiny" font_name="fantasy">
             Provided Tokens
           </ColoredText>
         </Col>
@@ -75,14 +75,14 @@ export const ConfirmCreateLP: React.FC<ConfirmCreateLPProps> = ({
         </Col>
       </Row>
       {mintAddrList.map(renderRow)}
-      <Row style={{ width: "100%" }}>
+      <Row style={{ width: "100%", marginTop: '3vh' }}>
         <Col className="gutter-row" span={12}>
           <ColoredText fonttype="semiMidTiny" font_name="fantasy">
             LP Token Amount
           </ColoredText>
         </Col>
         <Col className="gutter-row" span={12}>
-          <ColoredText fonttype="Tiny" font_name="fantasy">
+          <ColoredText fonttype="semiSmallTiny" font_name="fantasy">
             {lpTAmount}
           </ColoredText>
         </Col>

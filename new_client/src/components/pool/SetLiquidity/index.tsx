@@ -16,28 +16,10 @@ export const SetLiquidity: React.FC<SetLiquidityProps> = ({
   const handleChange = (event: any) => {
     setLpAmount(event?.target?.value);
   };
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { value: inputValue } = e.target;
-  //   const reg = /^-?\d*(\.\d*)?$/;
-  //   if (reg.test(inputValue) || inputValue === "" || inputValue === "-") {
-  //     setLpAmount(Number(inputValue));
-  //   }
-  // };
-
-  // // '.' at the end or only '-' in the input box.
-  // const handleBlur = () => {
-  //   let value = lpAmount.toString();
-  //   let valueTemp = value;
-  //   if (value.charAt(value.length - 1) === "." || value === "-") {
-  //     valueTemp = value.slice(0, -1);
-  //   }
-
-  //   setLpAmount(Number(valueTemp.replace(/0*(\d+)/, "$1")));
-  // };
 
   return (
     <LPTokenSetContainer>
-      <Row style={{ width: "100%" }}>
+      <Row style={{ width: "100%", marginTop: '5vh' }}>
         <Col className="gutter-row" span={10}>
           <ColoredText fonttype="semiMidTiny" font_name="fantasy">
             LP Token Amount
@@ -46,9 +28,8 @@ export const SetLiquidity: React.FC<SetLiquidityProps> = ({
         <Col className="gutter-row" span={10}>
           <Input
             placeholder="Amount"
-            // value={lpAmount}
+            defaultValue={0}
             onChange={handleChange}
-            // onBlur={handleBlur}
             maxLength={10}
           />
         </Col>

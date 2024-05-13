@@ -34,7 +34,7 @@ import {
   //     PoolConfig,
 } from "./../models";
 
-//   const LIQUIDITY_TOKEN_PRECISION = 8;
+export const LIQUIDITY_TOKEN_PRECISION = 6;
 
 //   export const removeLiquidity = async (
 //     connection: Connection,

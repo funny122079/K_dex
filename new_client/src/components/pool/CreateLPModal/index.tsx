@@ -54,99 +54,47 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
     setMintAddresss(mintAddresss.filter((_, index) => index !== indexToRemove));
   };
 
-  const setIndexedTokenAmount = (indexToUpdate: number, newValue: number) => {
-    console.log(`set token amount: index:${indexToUpdate}, value:${newValue}`);
-    tokenAmounts[indexToUpdate] = newValue;
-    setTokenAmounts(tokenAmounts);
-    // setTokenAmounts(
-    //   tokenAmounts.map((value, index) =>
-    //     index === indexToUpdate ? newValue : value
-    //   )
-    // );
-  };
-
-  useEffect(() => {
-    for (let i=0; i < tokenWeights.length; i++) {
-      console.log(`token weight: index:${i}, ${tokenWeights[i]}`);
-    }    
-  }, [tokenWeights])
-
-  const setIndexedTokenWeight = (indexToUpdate: number, newValue: number) => {
-    console.log(`set token weight: index:${indexToUpdate}, value:${newValue}`);
-    tokenWeights[indexToUpdate] = newValue;
-    setTokenWeights(tokenWeights);
-    // setTokenWeights(
-    //   tokenWeights.map((value, index) =>
-    //     index === indexToUpdate ? newValue : value
-    //   )
-    // );
-  };
-
-  const createLPSteps = useMemo(
-    () => [
-      {
-        title: "Select token & weights",
-        content: (
-          <SelectToken
-            mintAddrList={mintAddresss}
-            setMintAddrList={setMintAddresss}
-            addMintAddrList={addMintAddress}
-            removeMintAddrList={removeMintAddress}
-            tokenAmountList={tokenAmounts}
-            setTokenAmountList={setTokenAmounts}
-            addTAmount={addTAmount}
-            removeTAmount={removeTAmount}
-            tokenWeightList={tokenWeights}
-            setTokenWeightList={setTokenWeights}
-            addTWeight={addTWeight}
-            removeTWeight={removeTWeight}
-          />
-        ),
-      },
-      {
-        title: "Set liquidity",
-        content: (
-          <SetLiquidity
-            lpAmount={lpTokenAmount}
-            setLpAmount={setLpTokenAmount}
-          />
-        ),
-      },
-      {
-        title: "Confirm",
-        content: (
-          <ConfirmCreateLP
-            mintAddrList={mintAddresss}
-            tokenAmountList={tokenAmounts}
-            lpTAmount={lpTokenAmount}
-          />
-        ),
-      },
-    ],
-    [mintAddresss]
-  );
+  const createLPSteps = [
+    {
+      title: "Select token & weights",
+      content: (
+        <SelectToken
+          mintAddrList={mintAddresss}
+          setMintAddrList={setMintAddresss}
+          addMintAddrList={addMintAddress}
+          removeMintAddrList={removeMintAddress}
+          tokenAmountList={tokenAmounts}
+          setTokenAmountList={setTokenAmounts}
+          addTAmount={addTAmount}
+          removeTAmount={removeTAmount}
+          tokenWeightList={tokenWeights}
+          setTokenWeightList={setTokenWeights}
+          addTWeight={addTWeight}
+          removeTWeight={removeTWeight}
+        />
+      ),
+    },
+    {
+      title: "Set liquidity",
+      content: (
+        <SetLiquidity lpAmount={lpTokenAmount} setLpAmount={setLpTokenAmount} />
+      ),
+    },
+    {
+      title: "Confirm",
+      content: (
+        <ConfirmCreateLP
+          mintAddrList={mintAddresss}
+          tokenAmountList={tokenAmounts}
+          lpTAmount={lpTokenAmount}
+        />
+      ),
+    },
+  ];
 
   const next = async () => {
     switch (current) {
       case 0:
-        console.log(`next-0 size:${tokenWeights.length}`);
-        let totalWeight = 0;
-        for (let tokenWeight of tokenWeights) {
-          console.log(`next-0-sum weight: weight:${tokenWeight}`);
-          totalWeight += tokenWeight;
-        }
-
-        if (totalWeight != 100) {
-          // toast(
-          //   `Please, input correct token weight. Sum of weights should be 100`,
-          //   {
-          //     theme: "dark",
-          //   }
-          // );
-
-          // return;
-        }
-
         if (tokenAmounts[0] <= 0) {
           toast(`Please, input correct token amount`, {
             theme: "dark",
@@ -155,26 +103,45 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
           return;
         }
 
-        if (publicKey) {
-          if (
-            !(await checkTokenBalances(
-              connection,
-              mintAddresss,
-              tokenAmounts,
-              publicKey
-            ))
-          ) {
-            toast(`Not sufficient balance in your wallet. Please, charge!`, {
+        let totalWeight = 0;
+        let newTokenAmountList = [...tokenAmounts];
+        tokenWeights.map((tokenWeight, index) => {          
+          newTokenAmountList[index] = newTokenAmountList[0] * tokenWeight / tokenWeights[0];
+          totalWeight += Number(tokenWeight);
+        });        
+
+        if (totalWeight != 100) {
+          toast(
+            `Please, input correct token weight. Sum of weights should be 100`,
+            {
               theme: "dark",
-            });
-            return;
-          }
-        } else {
-          toast(`Please, connect your wallet!`, {
-            theme: "dark",
-          });
+            }
+          );
 
           return;
+        }
+
+        setTokenAmounts(newTokenAmountList);
+        
+        if (publicKey) {
+          // if (
+          //   !(await checkTokenBalances(
+          //     connection,
+          //     mintAddresss,
+          //     tokenAmounts,
+          //     publicKey
+          //   ))
+          // ) {
+          //   toast(`Not sufficient balance in your wallet. Please, charge!`, {
+          //     theme: "dark",
+          //   });
+          //   return;
+          // }
+        } else {
+          // toast(`Please, connect your wallet!`, {
+          //   theme: "dark",
+          // });
+          // return;
         }
 
         break;
@@ -201,7 +168,7 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
   }));
 
   const contentStyle: React.CSSProperties = {
-    height: "40vh",
+    height: "60vh",
     textAlign: "center",
     color: token.colorTextTertiary,
     backgroundColor: token.colorFillAlter,
