@@ -8,6 +8,11 @@ const DECIMALS: u64 = 1000000000;
 pub struct Oracle {}
 
 impl Oracle {
+  //new_ask_t/ask = bid/new_bid -> new_ask_t = bid * ask / new_bid
+  //fee = (ask - new_ask_t) * 0.25
+  //earning = (ask - new_ask_t) * 0.05
+  //new_ask = new_ask_t + fee
+  //paid_amount = ask - new_ask_t - fee - earning
   pub fn curve(new_bid_reserve: u64, bid_reserve: u64, ask_reserve: u64) -> Option<u64> {
     if new_bid_reserve == 0 || bid_reserve == 0 || ask_reserve == 0 {
       return None;
@@ -50,13 +55,14 @@ impl Oracle {
 
   pub fn _rake(
     delta: u64,
-    reserve_s: u64,
-    reserve_a: u64,
-    reserve_b: u64,
+    reserves: Vec<u64>,
   ) -> Option<(u64, u64, u64)> {
-    if reserve_s == 0 || reserve_a == 0 || reserve_b == 0 {
-      return None;
+    for reserve in reserves {
+      if reserve == 0 {
+        return None;
+      }
     }
+    
     if delta == 0 {
       return Some((0, 0, 0));
     }
@@ -87,15 +93,11 @@ impl Oracle {
   }
 
   pub fn rake(
-    delta_s: u64,
-    delta_a: u64,
-    delta_b: u64,
-    reserve_s: u64,
-    reserve_a: u64,
-    reserve_b: u64,
+    deltas: Vec<u64>,
+    reserves: Vec<u64>,
     reserve_lpt: u64,
-  ) -> Option<(u64, u64, u64, u64)> {
-    let rs = reserve_s;
+  ) -> Option<(u64, Vec<u64>)> {
+    let rs = reserves;
     let ra = reserve_a;
     let rb = reserve_b;
     let rlpt = reserve_lpt;

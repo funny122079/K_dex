@@ -27,6 +27,8 @@ pub enum AppError {
   FrozenPool,
   #[error("Zero value")]
   ZeroValue,
+  #[error("Insufficient funds")]
+  InsufficientFunds,
   #[error("Invalid mint")]
   InvalidMint,
   #[error("Exceed limit")]
@@ -58,7 +60,8 @@ impl PrintProgramError for AppError {
       AppError::Overflow => msg!("Error: Operation overflowed"),
       AppError::UnmatchedPool => msg!("Error: Pool unmatched"),
       AppError::FrozenPool => msg!("Error: Pool frozen"),
-      AppError::ZeroValue => msg!("Error: Zero value"),      
+      AppError::ZeroValue => msg!("Error: Zero value"),
+      AppError::InsufficientFunds => msg!("Error: Insufficient funds"),
       AppError::InvalidMint => msg!("Error: Invalid mint"),
       AppError::ExceedLimit => msg!("Error: Exceed limit"),
     }
