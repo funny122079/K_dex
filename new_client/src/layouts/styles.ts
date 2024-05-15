@@ -112,7 +112,7 @@ export const AppSidebarWrapper = styled.div<{ collapse: string }>`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  height: 78vh;
+  height: 83vh;
   padding: 10px 0;
   overflow-y: scroll;
   & > .ant-menu {

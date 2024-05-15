@@ -1,4 +1,4 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import { TokenAccount } from "./account";
 
 export interface PoolInfo {
@@ -27,4 +27,10 @@ export interface PoolConfig {
   ownerTradeFeeDenominator: number;
   ownerWithdrawFeeNumerator: number;
   ownerWithdrawFeeDenominator: number;
+}
+
+export const createInitPoolInstruction = (
+
+): TransactionInstruction => {
+
 }

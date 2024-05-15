@@ -1,6 +1,6 @@
 import * as BufferLayout from "buffer-layout";
 
-export const MAX_TOKEN_CNT_PROVIDE = 7;
+export const MAX_TOKEN_CNT_PROVIDE = 6;
 
 export const publicKey = (property: string = "publicKey"): Object => {
   return BufferLayout.blob(32, property);

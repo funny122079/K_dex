@@ -8,7 +8,7 @@ import ColoredText from "components/typography/ColoredText";
 
 import { TokenWrapper, CaptionContainer } from "./styles";
 import { TokenSelectModal } from "../TokenSelectModal";
-import { LIQUIDITY_TOKEN_PRECISION } from "utils/pools";
+import { MAX_TOKEN_CNT_PROVIDE } from "models/tokenSwap";
 
 const cellStyle: React.CSSProperties = {
   padding: "8px 0",
@@ -171,7 +171,7 @@ export const SelectToken: React.FC<SelectTokenProps> = ({
         {mintAddrList.map(renderRow)}
       </Row>
       <Popover content="New Token">
-        <Button icon={<PlusOutlined />} onClick={handleAddToken} disabled={tokenWeightList.length >= LIQUIDITY_TOKEN_PRECISION}>Select New Token</Button>
+        <Button icon={<PlusOutlined />} onClick={handleAddToken} disabled={tokenWeightList.length >= MAX_TOKEN_CNT_PROVIDE}>Select New Token</Button>
       </Popover>
       <TokenSelectModal
         isShow={isShow}

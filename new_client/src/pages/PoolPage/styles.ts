@@ -8,7 +8,7 @@ export const PoolWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 77vw;
-  height: 79vh;
+  height: 83vh;
 `;
 
 export const TitleContainer = styled.div`

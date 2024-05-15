@@ -10,7 +10,7 @@ export const SwapWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   width: 77vw;
-  height: 79vh;
+  height: 83vh;
 `;
 
 export const SwapTitleContainer = styled.div`
