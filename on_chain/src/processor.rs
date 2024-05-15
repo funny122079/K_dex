@@ -72,7 +72,7 @@ impl Processor {
     }
   }
 
-    pub fn initialize_pool(
+  pub fn initialize_pool(
     reserves: Vec<u64>,
     weights: Vec<64>,
     program_id: &Pubkey,
