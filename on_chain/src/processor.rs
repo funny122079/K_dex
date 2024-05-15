@@ -160,7 +160,7 @@ impl Processor {
       let mint_acc = mint_accs.get(i).ok_or(AppError::MissingAccount)?;
       let treasury_acc = treasury_accs.get(i).ok_or(AppError::MissingAccount)?;      
       let reserve = reserves.get(i).ok_or(AppError::MissingAccount)?;
-      // Initialize treasury S
+      // Initialize treasury_acc
       XSPLATA::initialize_account(
         payer,
         treasury_acc,

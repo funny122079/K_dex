@@ -7,6 +7,10 @@ let TOKEN_PROGRAM_ID = new PublicKey(
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
 
+const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID: PublicKey = new PublicKey(
+  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
+);
+
 let SWAP_PROGRAM_ID: PublicKey;
 
 export const SWAP_HOST_FEE_ADDRESS = process.env.REACT_APP_SWAP_HOST_FEE_ADDRESS
@@ -36,7 +40,7 @@ export const PROGRAM_IDS = [
   {
     name: "devnet",
     swap: () => ({
-      current: new PublicKey("BSfTAcBdqmvX5iE2PW88WFNNp2DHhLUaBKk5WrnxVkcJ"),
+      current: new PublicKey("FMTN5crpbCkxBSJ5Xpe6RHstACDkoWo7ukNV4Y9yL66R"),
     }),
   },
   {
@@ -60,7 +64,8 @@ export const setProgramIds = (envName: string) => {
 
 export const programIds = () => {
   return {
-    token: TOKEN_PROGRAM_ID,
+    ata: SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     swap: SWAP_PROGRAM_ID,
+    token: TOKEN_PROGRAM_ID,
   };
 };

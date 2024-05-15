@@ -1,13 +1,13 @@
 import {
-  //     Account,
+      Account,
   Connection,
   PublicKey,
-  //     SystemProgram,
-  //     TransactionInstruction,
+      SystemProgram,
+      TransactionInstruction,
 } from "@solana/web3.js";
 //   import { sendTransaction, useConnection } from "./connection";
 import { useEffect, useState } from "react";
-//   import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
+import { Token, MintLayout, AccountLayout } from "@solana/spl-token";
 //   import { notify } from "./notifications";
 //   import {
 //     cache,
@@ -22,7 +22,7 @@ import {
   //     WRAPPED_SOL_MINT,
 } from "./ids";
 import {
-  //     LiquidityComponent,
+  LiquidityComponent,
   PoolInfo,
   //     TokenAccount,
   //     createInitSwapInstruction,
@@ -34,7 +34,7 @@ import {
   //     PoolConfig,
 } from "./../models";
 
-export const LIQUIDITY_TOKEN_PRECISION = 6;
+export const LIQUIDITY_TOKEN_PRECISION = 8;
 
 //   export const removeLiquidity = async (
 //     connection: Connection,
@@ -710,90 +710,80 @@ export const usePools = (connection: Connection) => {
 //     return dependentTokenAmount / depPrecision;
 //   }
 
-//   // TODO: add ui to customize curve type
-//   async function _addLiquidityNewPool(
-//     wallet: any,
-//     connection: Connection,
-//     components: LiquidityComponent[],
-//     options: PoolConfig
-//   ) {
-//     notify({
-//       message: "Creating new pool...",
-//       description: "Please review transactions to approve.",
-//       type: "warn",
-//     });
+  // TODO: add ui to customize curve type
+  async function _addLiquidityNewPool(
+    walletPubKey: PublicKey,
+    connection: Connection,
+    components: LiquidityComponent[],
+    options: PoolConfig
+  ) {    
+    if (components.some((c) => !c.account)) {
+      console.log("_addLiquidityNewPool - account is missing");      
+      return;
+    }
 
-//     if (components.some((c) => !c.account)) {
-//       notify({
-//         message: "You need to have balance for all legs in the basket...",
-//         description: "Please review inputs.",
-//         type: "error",
-//       });
-//       return;
-//     }
+    let instructions: TransactionInstruction[] = [];
+    let cleanupInstructions: TransactionInstruction[] = [];
 
-//     let instructions: TransactionInstruction[] = [];
-//     let cleanupInstructions: TransactionInstruction[] = [];
+    const liquidityTokenAccount = new Account();
+    // Create account for pool liquidity token
+    instructions.push(
+      SystemProgram.createAccount({
+        fromPubkey: walletPubKey,
+        newAccountPubkey: liquidityTokenAccount.publicKey,
+        lamports: await connection.getMinimumBalanceForRentExemption(
+          MintLayout.span
+        ),
+        space: MintLayout.span,
+        programId: programIds().token,
+      })
+    );
 
-//     const liquidityTokenAccount = new Account();
-//     // Create account for pool liquidity token
-//     instructions.push(
-//       SystemProgram.createAccount({
-//         fromPubkey: wallet.publicKey,
-//         newAccountPubkey: liquidityTokenAccount.publicKey,
-//         lamports: await connection.getMinimumBalanceForRentExemption(
-//           MintLayout.span
-//         ),
-//         space: MintLayout.span,
-//         programId: programIds().token,
-//       })
-//     );
+    const poolAccount = new Account();
 
-//     const tokenSwapAccount = new Account();
+    const [authority, nonce] = await PublicKey.findProgramAddress(
+      [tokenSwapAccount.publicKey.toBuffer()],
+      programIds().swap
+    );
 
-//     const [authority, nonce] = await PublicKey.findProgramAddress(
-//       [tokenSwapAccount.publicKey.toBuffer()],
-//       programIds().swap
-//     );
+    // create mint for pool liquidity token
+    instructions.push(
+      Token.createInitMintInstruction(
+        programIds().token,
+        liquidityTokenAccount.publicKey,
+        LIQUIDITY_TOKEN_PRECISION,
+        // pass control of liquidity mint to swap program
+        authority,
+        // swap program can freeze liquidity token mint
+        null
+      )
+    );
 
-//     // create mint for pool liquidity token
-//     instructions.push(
-//       Token.createInitMintInstruction(
-//         programIds().token,
-//         liquidityTokenAccount.publicKey,
-//         LIQUIDITY_TOKEN_PRECISION,
-//         // pass control of liquidity mint to swap program
-//         authority,
-//         // swap program can freeze liquidity token mint
-//         null
-//       )
-//     );
+    // Create holding accounts for
+    const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
+      AccountLayout.span
+    );
+    const holdingAccounts: Account[] = [];
+    let signers: Account[] = [];
 
-//     // Create holding accounts for
-//     const accountRentExempt = await connection.getMinimumBalanceForRentExemption(
-//       AccountLayout.span
-//     );
-//     const holdingAccounts: Account[] = [];
-//     let signers: Account[] = [];
+    components.forEach((leg) => {
+      if (!leg.account) {
+        return;
+      }
 
-//     components.forEach((leg) => {
-//       if (!leg.account) {
-//         return;
-//       }
-
-//       const mintPublicKey = leg.account.info.mint;
-//       // component account to store tokens I of N in liquidity poll
-//       holdingAccounts.push(
-//         createSplAccount(
-//           instructions,
-//           wallet.publicKey,
-//           accountRentExempt,
-//           mintPublicKey,
-//           authority,
-//           AccountLayout.span
-//         )
-//       );
-//     });
+      const mintPublicKey = leg.account.info.mint;
+      // component account to store tokens I of N in liquidity poll
+      holdingAccounts.push(
+        createSplAccount(
+          instructions,
+          wallet.publicKey,
+          accountRentExempt,
+          mintPublicKey,
+          authority,
+          AccountLayout.span
+        )
+      );
+    });
 
 //     // creating depositor pool account
 //     const depositorAccount = createSplAccount(
