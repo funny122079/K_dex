@@ -11,6 +11,7 @@ type ColoredTextProps = {
 };
 
 const ColoredText = styled.span<ColoredTextProps>`  
+  align-items: center;  
   color: ${(props) => {
     if (props.text_attr_kinds === 'other_color') {
       return "#FFFFFFFF";
@@ -23,7 +24,8 @@ const ColoredText = styled.span<ColoredTextProps>`
     }
   }};
   font-weight: ${(props) => (props.emphazised === 'bold' ? "bold" : "normal")};
-
+  justify-content: center;
+  
   ${(props) =>
     props.backgroundType == 1 &&
     css`

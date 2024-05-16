@@ -99,6 +99,7 @@ export const TokenSelectModal: React.FC<TokenSelectLPProps> = ({
 
   const onSelectTokenHandler = (address: string, logoURI: string) => {
     mintAddrList[tokenIndex] = address;
+    console.log(`onSelectTokenHandler - address : ${address}`);
     onSelectToken(mintAddrList);
     onClose();
   };

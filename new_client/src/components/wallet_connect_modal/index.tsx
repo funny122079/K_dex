@@ -28,7 +28,7 @@ export const WalletModal: React.FC<SidebarProps> = ({ isShow, onClose }) => {
   const selectWallet = (walletName: WalletName) => {
     console.log("selectWallet!", walletName);
     select(walletName);
-    if (wallet) {
+    if (wallet) {      
       console.log("wallet selected");
       connect();
     } else {

@@ -1,10 +1,6 @@
 import * as BufferLayout from "buffer-layout";
-
+import { publicKey } from "models/pool";
 export const MAX_TOKEN_CNT_PROVIDE = 6;
-
-export const publicKey = (property: string = "publicKey"): Object => {
-  return BufferLayout.blob(32, property);
-};
 
 export const uint64 = (property: string = "uint64"): Object => {
   return BufferLayout.blob(8, property);
@@ -16,8 +12,8 @@ export const TokenSwapLayout: typeof BufferLayout.Structure =
     BufferLayout.u8("nonce"),
     publicKey("tokenProgramId"),
     BufferLayout.seq(publicKey(), MAX_TOKEN_CNT_PROVIDE, "tokenAccounts"),
-    BufferLayout.seq(publicKey(), MAX_TOKEN_CNT_PROVIDE, "mints"),    
-    publicKey("tokenPool"),    
+    BufferLayout.seq(publicKey(), MAX_TOKEN_CNT_PROVIDE, "mints"),
+    publicKey("tokenPool"),
     publicKey("feeAccount"),
     BufferLayout.u8("curveType"),
     uint64("tradeFeeNumerator"),

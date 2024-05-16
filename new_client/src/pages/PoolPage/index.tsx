@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import type { SearchProps } from "antd/es/input/Search";
 import { Button, Checkbox, Input, Table } from "antd";
@@ -68,6 +68,8 @@ export const PoolPage: React.FC = () => {
   const { connection } = useConnection();
   const { tokenList } = useContext(SPLTokenListContext);  
   const { pools } = usePools(connection);  
+  const { signTransaction } = useWallet();
+
   const [poolData, setPoolData] = useState<PoolTableDataType[]>([]);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [showLPDetailModal, setShowLPDetailModal] = useState(false);

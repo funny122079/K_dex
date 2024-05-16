@@ -1,7 +1,14 @@
 import React, { useContext } from "react";
 import {
+  Account,
   clusterApiUrl,
+  Connection,
+  ConfirmOptions,
+  PublicKey,
+  Transaction,
+  sendAndConfirmTransaction
 } from "@solana/web3.js";
+import { SignerWalletAdapterProps } from "@solana/wallet-adapter-base";
 
 import { useLocalStorageState } from "./utils";
 import { setProgramIds } from "./ids";
@@ -81,4 +88,43 @@ export function useConnectionConfig() {
 export function getEndpointName(endPoint: string) {
   const endPointObject = ENDPOINTS.find((ep) => ep.endpoint === endPoint);
   return endPointObject ? endPointObject.name : "";
+};
+
+export const sendTransaction = async (
+  connection: Connection,
+  walletPubKey: PublicKey,
+  transaction: Transaction,
+  signTransaction: SignerWalletAdapterProps['signTransaction'],
+  signers: Account[],
+) => {
+  let txid;
+  try{
+    transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+    transaction.setSigners(
+      // fee payied by the wallet owner
+      walletPubKey,
+      ...signers.map((s) => s.publicKey)
+    );
+    if (signers.length > 0) {
+      transaction.partialSign(...signers);
+    }
+    
+    transaction = await signTransaction(transaction);
+    let options : ConfirmOptions = {
+      skipPreflight: true,
+      commitment: "singleGossip",
+    };
+
+    txid = await sendAndConfirmTransaction(connection, transaction, signers, options);
+
+    if (txid) {
+      console.log("sendTransaction Succeed");
+    } else {
+      console.log("sendTransaction failed.");
+    }
+  } catch (error) {
+    console.log("Connection-sendTransaction error:", error);
+  }
+      
+  return txid;
 };

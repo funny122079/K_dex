@@ -24,5 +24,6 @@ export const SwapElementContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 1vh;
+  text-align: center;
   width: 60%;
 `;

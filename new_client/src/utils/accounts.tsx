@@ -1,12 +1,27 @@
-// import React, { useCallback, useContext, useEffect, useState } from "react";
-// import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
+import { TOKEN_PROGRAM_ID, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from "utils/ids";
 // import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-// import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
+import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
 
 // import { TokenAccount } from "./../models";
 // import { programIds, SWAP_HOST_FEE_ADDRESS, WRAPPED_SOL_MINT } from "./ids";
 
 // const AccountsContext = React.createContext<any>(null);
+
+export function findAssociatedTokenAddress(
+    walletAddress: PublicKey,
+    tokenMintAddress: PublicKey
+): PublicKey {
+    return PublicKey.findProgramAddressSync(
+        [
+            walletAddress.toBuffer(),
+            TOKEN_PROGRAM_ID.toBuffer(),
+            tokenMintAddress.toBuffer(),
+        ],
+        SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID
+    )[0];
+}
 
 // class AccountUpdateEvent extends Event {
 //     static type = "AccountUpdate";
@@ -332,39 +347,39 @@
 //   };
 // }
 
-// // const deserializeAccount = (data: Buffer) => {
-// //   const accountInfo = AccountLayout.decode(data);
-// //   accountInfo.mint = new PublicKey(accountInfo.mint);
-// //   accountInfo.owner = new PublicKey(accountInfo.owner);
-// //   accountInfo.amount = u64.fromBuffer(accountInfo.amount);
+const deserializeAccount = (data: Buffer) => {
+  const accountInfo = AccountLayout.decode(data);
+  accountInfo.mint = new PublicKey(accountInfo.mint);
+  accountInfo.owner = new PublicKey(accountInfo.owner);
+  accountInfo.amount = u64.fromBuffer(accountInfo.amount);
 
-// //   if (accountInfo.delegateOption === 0) {
-// //     accountInfo.delegate = null;
-// //     accountInfo.delegatedAmount = new u64(0);
-// //   } else {
-// //     accountInfo.delegate = new PublicKey(accountInfo.delegate);
-// //     accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount);
-// //   }
+  if (accountInfo.delegateOption === 0) {
+    accountInfo.delegate = null;
+    accountInfo.delegatedAmount = new u64(0);
+  } else {
+    accountInfo.delegate = new PublicKey(accountInfo.delegate);
+    accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount);
+  }
 
-// //   accountInfo.isInitialized = accountInfo.state !== 0;
-// //   accountInfo.isFrozen = accountInfo.state === 2;
+  accountInfo.isInitialized = accountInfo.state !== 0;
+  accountInfo.isFrozen = accountInfo.state === 2;
 
-// //   if (accountInfo.isNativeOption === 1) {
-// //     accountInfo.rentExemptReserve = u64.fromBuffer(accountInfo.isNative);
-// //     accountInfo.isNative = true;
-// //   } else {
-// //     accountInfo.rentExemptReserve = null;
-// //     accountInfo.isNative = false;
-// //   }
+  if (accountInfo.isNativeOption === 1) {
+    accountInfo.rentExemptReserve = u64.fromBuffer(accountInfo.isNative);
+    accountInfo.isNative = true;
+  } else {
+    accountInfo.rentExemptReserve = null;
+    accountInfo.isNative = false;
+  }
 
-// //   if (accountInfo.closeAuthorityOption === 0) {
-// //     accountInfo.closeAuthority = null;
-// //   } else {
-// //     accountInfo.closeAuthority = new PublicKey(accountInfo.closeAuthority);
-// //   }
+  if (accountInfo.closeAuthorityOption === 0) {
+    accountInfo.closeAuthority = null;
+  } else {
+    accountInfo.closeAuthority = new PublicKey(accountInfo.closeAuthority);
+  }
 
-// //   return accountInfo;
-// // };
+  return accountInfo;
+};
 
 // // const deserializeMint = (data: Buffer) => {
 // //   if (data.length !== MintLayout.span) {

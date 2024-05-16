@@ -30,17 +30,9 @@ pub struct Pool {
   pub mint_lpt: Pubkey,
   pub vault: Pubkey,
 
-  pub mint_s: Pubkey,
-  pub treasury_s: Pubkey,
-  pub reserve_s: u64,
-
-  pub mint_a: Pubkey,
-  pub treasury_a: Pubkey,
-  pub reserve_a: u64,
-
-  pub mint_b: Pubkey,
-  pub treasury_b: Pubkey,
-  pub reserve_b: u64,
+  pub mints: Vec<Pubkey>,  
+  pub treasurys: Vec<Pubkey>,
+  pub reserves: Vec<u64>,
 }
 
 impl Pool {
@@ -49,14 +41,10 @@ impl Pool {
   }
   
   pub fn get_reserve(&self, treasury: &Pubkey) -> Option<(u8, u64)> {
-    if self.treasury_s == *treasury {
-      return Some((0, self.reserve_s));
-    }
-    if self.treasury_a == *treasury {
-      return Some((1, self.reserve_a));
-    }
-    if self.treasury_b == *treasury {
-      return Some((2, self.reserve_b));
+    for (index, &treasure_item) in self.treasurys.iter().enumerate() {
+      if treasure_item == *treasury {          
+          return Some((index, self.reserves[index]));
+      }
     }
 
     None

@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { Button, message, Steps, theme } from "antd";
+import { PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Token } from "@solana/spl-token";
 
 import { SelectToken } from "../SelectToken";
 import { SetLiquidity } from "../SetLiquidity";
 import { ConfirmCreateLP } from "../ConfirmCreateLP";
-import { checkTokenBalances } from "utils/walletUtil";
+import { findAssociatedTokenAddress } from "utils/accounts";
+import { addLiquidity } from "utils/pools";
+
 import {
   CreateLPModalWrapper,
   CreateLPModalOverlay,
@@ -14,6 +18,7 @@ import {
   StepContainer,
   TitleContainer,
 } from "./styles";
+import { LiquidityComponent } from "models";
 
 type CreateLPProps = {
   isShow: boolean;
@@ -22,7 +27,7 @@ type CreateLPProps = {
 
 export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
   const { connection } = useConnection();
-  const { publicKey } = useWallet();
+  const { publicKey, signTransaction } = useWallet();
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [mintAddresss, setMintAddresss] = useState<string[]>(["", ""]);
@@ -105,10 +110,11 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
 
         let totalWeight = 0;
         let newTokenAmountList = [...tokenAmounts];
-        tokenWeights.map((tokenWeight, index) => {          
-          newTokenAmountList[index] = newTokenAmountList[0] * tokenWeight / tokenWeights[0];
+        tokenWeights.map((tokenWeight, index) => {
+          newTokenAmountList[index] =
+            (newTokenAmountList[0] * tokenWeight) / tokenWeights[0];
           totalWeight += Number(tokenWeight);
-        });        
+        });
 
         if (totalWeight != 100) {
           toast(
@@ -122,7 +128,7 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
         }
 
         setTokenAmounts(newTokenAmountList);
-        
+
         if (publicKey) {
           // if (
           //   !(await checkTokenBalances(
@@ -138,10 +144,57 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
           //   return;
           // }
         } else {
-          // toast(`Please, connect your wallet!`, {
-          //   theme: "dark",
-          // });
-          // return;
+          toast(`Please, connect your wallet!`, {
+            theme: "dark",
+          });
+          
+          return;
+        }
+
+        const mintAddrA = "";
+        const mintAddrB = "";
+        const mintAddrS = "";
+
+        let ataA, ataB, ataS;
+        if (publicKey) {
+          ataA = findAssociatedTokenAddress(
+            publicKey,
+            new PublicKey(mintAddrA)
+          );
+          ataB = findAssociatedTokenAddress(
+            publicKey,
+            new PublicKey(mintAddrB)
+          );
+          ataS = findAssociatedTokenAddress(
+            publicKey,
+            new PublicKey(mintAddrS)
+          );
+
+          const components: LiquidityComponent[] = [
+            {
+              account: ataA,
+              mintAddress: mintAddrA,
+              amount: 10,
+            },
+            {
+              account: ataB,
+              mintAddress: mintAddrB,
+              amount: 10,
+            },
+            {
+              account: ataS,
+              mintAddress: mintAddrS,
+              amount: 10,
+            },
+          ];
+
+          if (signTransaction) {
+            addLiquidity(publicKey, signTransaction, connection, components, 0);
+          } else {
+            toast(`Please, connect your wallet!`, {
+              theme: "dark",
+            });
+          }
         }
 
         break;

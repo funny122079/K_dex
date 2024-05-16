@@ -1,8 +1,6 @@
 import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 import * as BufferLayout from "buffer-layout";
 
-import { TokenAccount } from "./account";
-
 export interface PoolInfo {
   pubkeys: {
     program: PublicKey;
@@ -17,7 +15,7 @@ export interface PoolInfo {
 
 export interface LiquidityComponent {
   amount: number;
-  account?: TokenAccount;
+  account?: PublicKey;
   mintAddress: string;
 }
 
@@ -30,6 +28,28 @@ export interface PoolConfig {
   ownerWithdrawFeeNumerator: number;
   ownerWithdrawFeeDenominator: number;
 }
+
+export const publicKey = (property: string = "publicKey"): Object => {
+  return BufferLayout.blob(32, property);
+};
+
+export const PoolLayout: typeof BufferLayout.Structure = BufferLayout.struct(
+  [
+    publicKey("owner"),
+    BufferLayout.u8("state"),    
+    publicKey("mint_lpt"),
+    publicKey("vault"),
+    publicKey("mint_s"),
+    publicKey("treasury_s"),
+    publicKey("reserve_s"),
+    publicKey("mint_a"),
+    publicKey("treasury_a"),
+    publicKey("reserve_a"),
+    publicKey("mint_b"),
+    publicKey("treasury_b"),
+    publicKey("reserve_b"),
+  ]
+);
 
 export const createInitPoolInstruction = (
   payerAccount: PublicKey,
