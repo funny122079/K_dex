@@ -4,7 +4,7 @@ use crate::instruction::AppInstruction;
 use crate::interfaces::{xsplata::XSPLATA, xsplt::XSPLT};
 use crate::schema::{
     mint::Mint,
-    pool::{Pool, PoolState},
+    pool::{Pool, PoolState, MAX_TOKEN_COUNT}, 
 };
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
@@ -13,8 +13,6 @@ use solana_program::{
     program_pack::{IsInitialized, Pack},
     pubkey::{Pubkey, PubkeyError},
 };
-
-const MAX_TOKEN_COUNT: u8 = 6;
 
 pub struct Processor {}
   
