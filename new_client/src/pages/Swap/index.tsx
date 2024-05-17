@@ -3,14 +3,16 @@ import { Button, Popover } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 
 import { CurrencyInput } from "../../components/CurrencyInput";
+import ColoredText from "components/typography/ColoredText";
 import { SlippagTolerancePopover } from "../../components/SlippagTolerancePopover";
 // import { useCurrencyPairState } from "../../utils/currencyPair";
 import {
   SwapElementContainer,
   SwapWrapper,
   SwapTitleContainer,
+  TitleContainer,
 } from "./styles";
-import ColoredText from "components/typography/ColoredText";
+import "pages/styles.css";
 
 interface Token {
   symbol: string;
@@ -37,80 +39,93 @@ export const Swap: React.FC = () => {
     //   B.setAmount(tempAmount);
   };
 
-  const onSwapHandler = () => {
-
-  }
+  const onSwapHandler = () => {};
 
   return (
     <SwapWrapper>
       <SwapTitleContainer>
-        <ColoredText
-          text_attr_kinds="other_color"
-          fonttype="small"
-          font_name="fantasy"
-        >
-          Swap
-        </ColoredText>
-        <Popover
-          placement="bottomRight"
-          content={
-            <SlippagTolerancePopover
-              slipTol={slippageTolerance}
-              setSlipTol={setSlippageTolerance}
-            />
-          }
-          trigger="click"
-        >
-          <SettingOutlined style={{ fontSize: "2vw", cursor: "pointer" }} />
-        </Popover>
+        <TitleContainer>
+          <img src="/assets/images/room-logo.png" alt="" draggable="false" />
+          <ColoredText
+            text_attr_kinds="other_color"
+            fonttype="semiTiny"
+            font_name="fantasy"
+          >
+            Swap
+          </ColoredText>
+        </TitleContainer>
+        <div id="slippage-container">          
+          <Popover
+            placement="bottomRight"
+            content={
+              <SlippagTolerancePopover
+                slipTol={slippageTolerance}
+                setSlipTol={setSlippageTolerance}
+              />
+            }
+            trigger="click"
+          >
+            <SettingOutlined style={{ fontSize: "2vw", cursor: "pointer" }} />
+          </Popover>
+        </div>
       </SwapTitleContainer>
-      <CurrencyInput title={tokens[0].symbol} avatar={tokens[0].avatar} onInputChange={(val: number) => {
-        setTokenAmount(val);
-        }} amount={tokenAmount} />
-      <Button type="primary" className="swap-button" onClick={swapAccounts}>
-        ⇅
-      </Button>
-      <CurrencyInput
-        title={tokens[1].symbol} avatar={tokens[1].avatar}
-        onInputChange={(val: any) => {
-          // if (B.amount !== val) {
-          //   setLastTypedAccount(B.mintAddress);
-          // }
-          // B.setAmount(val);
-        }}
-        // amount={B.amount}
-        // mint={B.mintAddress}
-        // onMintChange={(item) => {
-        // B.setMint(item);
-        // }}
-      />
+      <div id="swap-balance-container">
+        <CurrencyInput
+          title={tokens[0].symbol}
+          avatar={tokens[0].avatar}
+          onInputChange={(val: number) => {
+            setTokenAmount(val);
+          }}
+          amount={tokenAmount}
+        />
+        <div id="balance-exchange-button" >
+        <Button type="primary" className="swap-button" onClick={swapAccounts}>
+          ⇅
+        </Button>
+        </div>
+        <CurrencyInput
+          title={tokens[1].symbol}
+          avatar={tokens[1].avatar}
+          onInputChange={(val: any) => {
+            // if (B.amount !== val) {
+            //   setLastTypedAccount(B.mintAddress);
+            // }
+            // B.setAmount(val);
+          }}
+          // amount={B.amount}
+          // mint={B.mintAddress}
+          // onMintChange={(item) => {
+          // B.setMint(item);
+          // }}
+        />
+      </div>
       <SwapElementContainer>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="semiSmallTiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           Price
         </ColoredText>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="Tiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
-          {(tokenAmount * 1.5).toFixed(3)} 
+          {(tokenAmount * 1.5).toFixed(3)}
         </ColoredText>
       </SwapElementContainer>
       <SwapElementContainer>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="semiSmallTiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           Price Impact
         </ColoredText>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="Tiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           {(tokenAmount / 20).toFixed(3)} %
@@ -119,14 +134,14 @@ export const Swap: React.FC = () => {
       <SwapElementContainer>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="semiSmallTiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           Slippage Tolerance
         </ColoredText>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="Tiny"
+          fonttype="tiny"
           font_name="fantasy"
           backgroundType={1}
         >
@@ -136,20 +151,22 @@ export const Swap: React.FC = () => {
       <SwapElementContainer>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="semiSmallTiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           Routes
         </ColoredText>
         <ColoredText
           text_attr_kinds="other_color"
-          fonttype="Tiny"
+          fonttype="tiny"
           font_name="fantasy"
         >
           {tokens[0].symbol} - {tokens[1].symbol}
         </ColoredText>
       </SwapElementContainer>
-      <Button type="primary" onClick={onSwapHandler} style={{ width: '30vw'}}>Swap</Button>
+      <Button type="primary" onClick={onSwapHandler} style={{ width: "30vw" }}>
+        Swap
+      </Button>
     </SwapWrapper>
   );
 };

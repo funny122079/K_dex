@@ -10,6 +10,7 @@ import { SetLiquidity } from "../SetLiquidity";
 import { ConfirmCreateLP } from "../ConfirmCreateLP";
 import { findAssociatedTokenAddress } from "utils/accounts";
 import { addLiquidity } from "utils/pools";
+import { checkTokenBalances } from "utils/walletUtil";
 
 import {
   CreateLPModalWrapper,
@@ -100,6 +101,7 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
   const next = async () => {
     switch (current) {
       case 0:
+        
         if (tokenAmounts[0] <= 0) {
           toast(`Please, input correct token amount`, {
             theme: "dark",
@@ -130,19 +132,20 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
         setTokenAmounts(newTokenAmountList);
 
         if (publicKey) {
-          // if (
-          //   !(await checkTokenBalances(
-          //     connection,
-          //     mintAddresss,
-          //     tokenAmounts,
-          //     publicKey
-          //   ))
-          // ) {
-          //   toast(`Not sufficient balance in your wallet. Please, charge!`, {
-          //     theme: "dark",
-          //   });
-          //   return;
-          // }
+          console.log(`pubKey: ${publicKey}`);
+          if (
+            !(await checkTokenBalances(
+              connection,
+              mintAddresss,
+              tokenAmounts,
+              publicKey
+            ))
+          ) {
+            toast(`Not sufficient balance in your wallet. Please, charge!`, {
+              theme: "dark",
+            });
+            return;
+          }
         } else {
           toast(`Please, connect your wallet!`, {
             theme: "dark",

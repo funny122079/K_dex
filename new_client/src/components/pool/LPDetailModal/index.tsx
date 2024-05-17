@@ -10,6 +10,10 @@ import {
   Tooltip,
 } from "chart.js";
 
+import ColoredText from "components/typography/ColoredText";
+import { Deposit } from "components/pool/Deposit";
+import { Withdraw } from "components/pool/Withdraw";
+
 import { PoolTableDataType } from "pages/PoolPage";
 import {
   LPDetailModalWrapper,
@@ -18,7 +22,7 @@ import {
   CloseBtn,
   LPOperationContainer,
 } from "./styles";
-import ColoredText from "components/typography/ColoredText";
+import "components/pool/LPDetailModal/styles.css";
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -43,6 +47,8 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
   poolData,
 }) => {
   const [weightGraphColors, setWeightGraphColors] = useState([""]);
+  const [ depositShowFlag, setDepositShowFlag] = useState(false);
+  const [ withdrawShowFlag, setWithdrawShowFlag] = useState(false);
 
   useEffect(() => {
     try {
@@ -94,11 +100,21 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
     maintainAspectRatio: true,
   };
 
+  const closeDepositModal = () => {
+    setDepositShowFlag(false);
+  }
+
+  const closeWithdrawModal = () => {
+    setWithdrawShowFlag(false);
+  }
+
   const onWithdrawHandler = () => {
-    
+    setWithdrawShowFlag(true);
   };
 
-  const onDepositHandler = () => {};
+  const onDepositHandler = () => {
+    setDepositShowFlag(true);    
+  };
 
   return (
     <>
@@ -107,12 +123,13 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
           <span onClick={onClose}>&times;</span>
         </CloseBtn>
         <Row style={{ width: "100%", marginBottom: "3vh" }}>
+          <Col className="gutter-row" span={2}></Col>
           <Col className="gutter-row" span={4}>
             <ColoredText fonttype="small" font_name="fantasy">
               {poolData.poolName}
             </ColoredText>
           </Col>
-          <Col className="gutter-row" span={14}></Col>
+          <Col className="gutter-row" span={12}></Col>
           <Col className="gutter-row" span={6}>
             <LPOperationContainer>
               <Button onClick={onWithdrawHandler}>Withdraw</Button>
@@ -123,6 +140,7 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
           </Col>
         </Row>
         <Row style={{ width: "100%", marginBottom: "3vh" }}>
+          <Col className="gutter-row" span={2}></Col>
           <Col className="gutter-row" span={6}>
             <ColoredText fonttype="small" font_name="fantasy">
               TVL
@@ -138,7 +156,8 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
               My Contribution
             </ColoredText>
           </Col>
-          <Col className="gutter-row" span={6}></Col>
+          <Col className="gutter-row" span={4}></Col>
+          <Col className="gutter-row" span={2}></Col>
           <Col className="gutter-row" span={6}>
             <ColoredText fonttype="semiSmallTiny" font_name="fantasy">
               {poolData.tvl}
@@ -154,19 +173,21 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
               {poolData.contribution}
             </ColoredText>
           </Col>
-          <Col className="gutter-row" span={6}></Col>
+          <Col className="gutter-row" span={4}></Col>
         </Row>
         <Row style={{ width: "100%", marginBottom: "2vh" }}>
-          <Col className="gutter-row" span={12}>
+          <Col className="gutter-row" span={2}></Col>
+          <Col className="gutter-row" span={10}>
             <ColoredText fonttype="small" font_name="fantasy">
               Volume 24h
             </ColoredText>
           </Col>
-          <Col className="gutter-row" span={12}>
+          <Col className="gutter-row" span={10}>
             <ColoredText fonttype="small" font_name="fantasy">
               Pool Weight
             </ColoredText>
           </Col>
+          <Col className="gutter-row" span={2}></Col>
         </Row>
         <Row
           style={{
@@ -175,23 +196,27 @@ export const LPDetailModal: React.FC<LPDetailProps> = ({
             // justifyContent: "center",
           }}
         >
-          <Col className="gutter-row" span={12}>
-            <CenterElements>
+          <Col className="gutter-row" span={2}></Col>
+          <Col className="gutter-row" span={10}>
+            <div id="date-bar-graph">
               <Bar data={data} options={options} />
-            </CenterElements>
+            </div>
           </Col>
-          <Col className="gutter-row" span={12}>
-            <CenterElements>
+          <Col className="gutter-row" span={2}></Col>
+          <Col className="gutter-row" span={8}>
+            <div id="weight-pie-graph">
               <Pie
                 data={weightGraphData}
                 options={options}
-                style={{ width: "23vw", height: "23vw" }}
               />
-            </CenterElements>
+            </div>
           </Col>
+          <Col className="gutter-row" span={2}></Col>
         </Row>
       </LPDetailModalWrapper>
       <LPDetailModalOverlay $isshow={isShow} onClick={onClose} />
+      <Deposit isShow={depositShowFlag} onClose={closeDepositModal} />
+      <Withdraw isShow={withdrawShowFlag} onClose={closeWithdrawModal} />
     </>
   );
 };

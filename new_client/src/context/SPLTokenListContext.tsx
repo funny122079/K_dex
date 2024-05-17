@@ -10,6 +10,7 @@ export const SPLTokenListProvider: FC<{ children: ReactNode }> = ({ children }) 
 
   useEffect(() => {
     const fetchTokenList = async () => {
+      console.log(`fetch token in context : net : ${env}`);
       const tokens = await new TokenListProvider().resolve();
       const list = tokens.filterByClusterSlug(env).getList();
       setTokenList(
@@ -21,7 +22,7 @@ export const SPLTokenListProvider: FC<{ children: ReactNode }> = ({ children }) 
     };
   
     fetchTokenList();
-  }, []);
+  }, [env]);
 
   return (
     <SPLTokenListContext.Provider value={{ tokenList }}>

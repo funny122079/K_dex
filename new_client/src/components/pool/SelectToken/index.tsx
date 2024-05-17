@@ -11,7 +11,7 @@ import { TokenSelectModal } from "../TokenSelectModal";
 import { MAX_TOKEN_CNT_PROVIDE } from "models/tokenSwap";
 
 const cellStyle: React.CSSProperties = {
-  padding: "8px 0",
+  padding: "0.4vw 0",
   height: "fit-content",
 };
 

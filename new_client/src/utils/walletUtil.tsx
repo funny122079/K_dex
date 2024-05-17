@@ -1,5 +1,6 @@
 import { Account, Connection, PublicKey } from "@solana/web3.js";
-import { Token } from "@solana/spl-token";
+import { AccountLayout } from "@solana/spl-token";
+import { programIds } from "./ids";
 
 // export async function getTokenBalance(connection: Connection, tokenAddress: string, walletAddress: string): Promise<number> {
 //     try {
@@ -27,28 +28,31 @@ import { Token } from "@solana/spl-token";
 //     return 0;
 // }
 
-export async function checkTokenBalances(connection: Connection, tokenAddresses: string[], amount: number[], walletAddress: PublicKey): Promise<boolean> {
+export async function checkTokenBalances(
+  connection: Connection,
+  tokenAddresses: string[],
+  amount: number[],
+  walletAddress: PublicKey
+): Promise<boolean> {
   try {
-    // let index = 0;
-    // for (let tokenAddress of tokenAddresses) {
-    //   let token = new Token(
-    //     connection,
-    //     new PublicKey(tokenAddress), // Token address
-    //     new PublicKey(""), // We can leave this empty if we're not initializing a new token
-    //     new Account() // Payer, not necessary for fetching balance
-    //   );
-  
-    //   // Get account info
-    //   let walletTokenAccountInfo = await token.getAccountInfo(
-    //     new PublicKey(walletAddress) // Wallet address/public key
-    //   );
-  
-    //   // Balance as per the token’s decimal amount
-    //   let balance = walletTokenAccountInfo.amount.toNumber();
-    //   if (balance < amount[index]) return false;
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      walletAddress,
+      {
+        programId: programIds().token,
+      }
+    );
 
-    //   index++;
-    // }
+    tokenAccounts.value.forEach((tokenAccount) => {
+      const accountData = AccountLayout.decode(tokenAccount.account.data);
+
+      for (let index = 0; index < tokenAddresses.length; index++) {
+        if (tokenAddresses[index] && tokenAddresses[index] === accountData.mint) {
+          if (!amount[index] || amount[index] > accountData.amount) {
+              return false;
+          }
+        }
+      }        
+    });
   } catch (err) {
     console.error(`walletUtil-checkTokenBalance: error`, err);
     return false;

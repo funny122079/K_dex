@@ -1,0 +1,28 @@
+#balance-exchange-button {
+    display:flex;
+    height:5vh;
+    margin-top:0.5vh;
+    margin-bottom:0.5vh;
+    width:5vw;
+}
+
+.mark-img {
+    width: 1.5vw;
+    height: 1.5vw;
+}
+
+#slippage-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 2vw;
+}
+
+#swap-balance-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;    
+    height: 40vh;
+    justify-content: center;
+    margin-top:1vw;
+    width: 60%;
+}

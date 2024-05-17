@@ -15,8 +15,9 @@ export const SwapWrapper = styled.div`
 
 export const SwapTitleContainer = styled.div`
   display: flex;
+  margin-top: 1vw;
   justify-content: space-between;
-  width: 60%;
+  width: 70%;
 `;
 
 export const SwapElementContainer = styled.div`
@@ -26,4 +27,23 @@ export const SwapElementContainer = styled.div`
   margin-bottom: 1vh;
   text-align: center;
   width: 60%;
+`;
+
+export const TitleContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  & img:first-child {
+    height: 6vw;
+    margin-right: 1.5vw;
+    margin-left: 2vw;
+    width: 6vw;
+  }
+
+  & img:last-child {
+    height: 100%;
+    width: auto;
+  }
 `;

@@ -13,6 +13,7 @@ import {
   CloseBtn,
 } from "./styles";
 import ColoredText from "components/typography/ColoredText";
+import "components/pool/TokenSelectModal/styles.css";
 
 const { Search } = Input;
 
@@ -97,11 +98,16 @@ export const TokenSelectModal: React.FC<TokenSelectLPProps> = ({
     }
   };
 
-  const onSelectTokenHandler = (address: string, logoURI: string) => {
-    mintAddrList[tokenIndex] = address;
-    console.log(`onSelectTokenHandler - address : ${address}`);
-    onSelectToken(mintAddrList);
-    onClose();
+  const onSelectTokenHandler = (address: string, logoURI: string) => {    
+    if (mintAddrList[tokenIndex]) {
+      mintAddrList[tokenIndex] = address;
+    
+      console.log(`onSelectTokenHandler - address : ${address}`);
+      onSelectToken(mintAddrList);
+      onClose();
+    } else {
+      console.log(`onSelectTokenHandler failed : incorrect index of address list`);
+    }    
   };
 
   return (
@@ -127,15 +133,11 @@ export const TokenSelectModal: React.FC<TokenSelectLPProps> = ({
         <TokensContainer>
           {displayTokenList.map(([address, { name, symbol, logoURI }]) => (
             <div
+              className="display-tokens"
               key={address}
               onClick={() =>
                 onSelectTokenHandler(address, logoURI ? logoURI : "")
               }
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "3vh",
-              }}
             >
               <Avatar src={logoURI} size={40} />
               <TokenLabelContainer>

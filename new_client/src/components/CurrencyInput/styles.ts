@@ -2,9 +2,7 @@ import styled from "styled-components";
 import { Card } from "antd";
 
 export const CurrencyInputCardWrapper = styled(Card)`
-  
   borderradius: 2vw;
-  margin: 1.5vw;
   padding: 0;
 
   .ant-select-selector,
@@ -26,16 +24,14 @@ export const CurrencyInputHeader = styled.div`
   -webkit-box-align: center;
   align-items: center;
   flex-direction: row;
-  padding: 1vh 2vw 0vh 2vw;
+  padding: 0.2vh 0.5vw 0vh 0.5vw;
 `;
 
 export const CurrencyInputHeaderLeft = styled.div`
   width: 100%;
   box-sizing: border-box;
-  margin: 0px;
   min-width: 0px;
   display: flex;
-  padding: 0px;
   -webkit-box-align: center;
   align-items: center;
   width: fit-content;

@@ -60,7 +60,7 @@ export const CurrencyInput = (props: {
       <CurrencyInputHeader>
         <CurrencyInputHeaderLeft>
           <div style={cellStyle}>
-            <Avatar src={props.avatar} size={50} />
+            <Avatar src={props.avatar} size={40} />
           </div>
           <div style={cellStyle}>
             <Button type="text" onClick={() => setIsShow(true)}>
