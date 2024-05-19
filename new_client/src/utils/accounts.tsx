@@ -1,26 +1,48 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from "utils/ids";
-// import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { AccountLayout, u64, MintInfo, MintLayout } from "@solana/spl-token";
+import bs58 from "bs58";
 
-// import { TokenAccount } from "./../models";
-// import { programIds, SWAP_HOST_FEE_ADDRESS, WRAPPED_SOL_MINT } from "./ids";
+import { PoolInfo } from "models";
+import { usePools } from "utils/pools";
 
-// const AccountsContext = React.createContext<any>(null);
+const AccountsContext = React.createContext<any>(null);
 
-export function findAssociatedTokenAddress(
+export async function findAssociatedTokenAddress(
+  connection: Connection,
     walletAddress: PublicKey,
     tokenMintAddress: PublicKey
-): PublicKey {
-    return PublicKey.findProgramAddressSync(
-        [
-            walletAddress.toBuffer(),
-            TOKEN_PROGRAM_ID.toBuffer(),
-            tokenMintAddress.toBuffer(),
-        ],
-        SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID
-    )[0];
+): Promise<PublicKey> {
+  let tokenAccountForMint;
+
+  try {
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      walletAddress,
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+
+    for (const tokenAccount of tokenAccounts.value) {
+      const accountData = AccountLayout.decode(tokenAccount.account.data);            
+      if (new PublicKey(accountData.mint).toString() === tokenMintAddress.toString()) {
+        console.log(`account: ${tokenAccount.pubkey.toString()}, mint: ${tokenMintAddress.toString()}`);
+        tokenAccountForMint = tokenAccount.pubkey;
+        break;
+      }
+    }  
+
+    if(!tokenAccountForMint) {
+      throw new Error('No token account found for this mint address');
+    }
+  } catch (error) {
+    console.log("accounts-findAssociatedTokenAddress: error:", error);
+    return new PublicKey("");
+  }
+
+  return tokenAccountForMint;
 }
 
 // class AccountUpdateEvent extends Event {
@@ -216,97 +238,21 @@ export function findAssociatedTokenAddress(
 //     });
 // };
 
-// export function AccountsProvider({ children = null as any }) {
-//   const { connection } = useConnection();
-//   const { publicKey } = useWallet();
-//   const [tokenAccounts, setTokenAccounts] = useState<TokenAccount[]>([]);
-//   const [userAccounts, setUserAccounts] = useState<TokenAccount[]>([]);
-//   // const { nativeAccount } = UseNativeAccount(connection, publicKey);
+export function AccountsProvider({ children = null as any }) {
+  const { connection } = useConnection();
+  const { publicKey } = useWallet();
+  const { pools } = usePools(connection);
 
-//   const selectUserAccounts = useCallback(() => {
-//     return [...accountsCache.values()].filter(
-//       (a) => a.info.owner.toBase58() === publicKey?.toBase58()
-//     );
-//   }, [publicKey]);
-
-//   // useEffect(() => {
-//   //   setUserAccounts(
-//   //     [
-//   //       publicKey && wrapNativeAccount(publicKey, nativeAccount),
-//   //       ...tokenAccounts,
-//   //     ].filter((a) => a !== undefined) as TokenAccount[]
-//   //   );
-//   // }, [nativeAccount, publicKey, tokenAccounts]);
-
-//   useEffect(() => {
-//     if (!connection || !publicKey) {
-//       setTokenAccounts([]);
-//     } else {
-//       // cache host accounts to avoid query during swap
-//       precacheUserTokenAccounts(connection, SWAP_HOST_FEE_ADDRESS);
-
-//       precacheUserTokenAccounts(connection, publicKey).then(() => {
-//         setTokenAccounts(selectUserAccounts());
-//       });
-
-//       // This can return different types of accounts: token-account, mint, multisig
-//       // TODO: web3.js expose ability to filter. discuss filter syntax
-//       const tokenSubID = connection.onProgramAccountChange(
-//         programIds().token,
-//         (info) => {
-//           // TODO: fix type in web3.js
-//           const id = info.accountId as unknown as string;
-//           // TODO: do we need a better way to identify layout (maybe a enum identifing type?)
-//           if (info.accountInfo.data.length === AccountLayout.span) {
-//             const data = deserializeAccount(info.accountInfo.data);
-//             // TODO: move to web3.js for decoding on the client side... maybe with callback
-//             const details = {
-//               pubkey: new PublicKey(info.accountId as unknown as string),
-//               account: {
-//                 ...info.accountInfo,
-//               },
-//               info: data,
-//             } as TokenAccount;
-
-//             if (
-//               PRECACHED_OWNERS.has(details.info.owner.toBase58()) ||
-//               accountsCache.has(id)
-//             ) {
-//               accountsCache.set(id, details);
-//               setTokenAccounts(selectUserAccounts());
-//               accountEmitter.raiseAccountUpdated(id);
-//             }
-//           } else if (info.accountInfo.data.length === MintLayout.span) {
-//             if (mintCache.has(id)) {
-//               const data = Buffer.from(info.accountInfo.data);
-//               const mint = deserializeMint(data);
-//               mintCache.set(id, new Promise((resolve) => resolve(mint)));
-//               accountEmitter.raiseAccountUpdated(id);
-//             }
-
-//             accountEmitter.raiseAccountUpdated(id);
-//           }
-//         },
-//         "singleGossip"
-//       );
-
-//       return () => {
-//         connection.removeProgramAccountChangeListener(tokenSubID);
-//       };
-//     }
-//   }, [connection, publicKey]);
-
-//   return (
-//     <AccountsContext.Provider
-//       value={{
-//         userAccounts,
-//         // nativeAccount,
-//       }}
-//     >
-//       {children}
-//     </AccountsContext.Provider>
-//   );
-// }
+  return (
+    <AccountsContext.Provider
+      value={{
+        pools
+      }}
+    >
+      {children}
+    </AccountsContext.Provider>
+  );
+}
 
 // // export function useMint(id?: string) {
 // //   const { connection } = useConnection();
@@ -380,6 +326,13 @@ const deserializeAccount = (data: Buffer) => {
 
   return accountInfo;
 };
+
+export function useCachedPool() {
+  const context = useContext(AccountsContext);
+  return {
+    pools: context.pools as PoolInfo[],
+  };
+}
 
 // // const deserializeMint = (data: Buffer) => {
 // //   if (data.length !== MintLayout.span) {

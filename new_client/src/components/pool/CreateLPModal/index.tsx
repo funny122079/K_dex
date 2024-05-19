@@ -1,16 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { Button, message, Steps, theme } from "antd";
 import { PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Token } from "@solana/spl-token";
 
 import { SelectToken } from "../SelectToken";
 import { SetLiquidity } from "../SetLiquidity";
 import { ConfirmCreateLP } from "../ConfirmCreateLP";
 import { findAssociatedTokenAddress } from "utils/accounts";
 import { addLiquidity } from "utils/pools";
-import { checkTokenBalances } from "utils/walletUtil";
+import { PoolConfig } from "models";
 
 import {
   CreateLPModalWrapper,
@@ -26,15 +25,26 @@ type CreateLPProps = {
   onClose: () => void;
 };
 
+export const DEFAULT_DENOMINATOR = 10_000;
+
 export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
   const { connection } = useConnection();
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey, signTransaction, wallet } = useWallet();
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [mintAddresss, setMintAddresss] = useState<string[]>(["", ""]);
   const [tokenAmounts, setTokenAmounts] = useState<number[]>([0, 0]);
   const [tokenWeights, setTokenWeights] = useState<number[]>([0, 0]);
   const [lpTokenAmount, setLpTokenAmount] = useState(0);
+  const [options, setOptions] = useState<PoolConfig>({
+    curveType: 0,
+    tradeFeeNumerator: 25,
+    tradeFeeDenominator: DEFAULT_DENOMINATOR,
+    ownerTradeFeeNumerator: 5,
+    ownerTradeFeeDenominator: DEFAULT_DENOMINATOR,
+    ownerWithdrawFeeNumerator: 0,
+    ownerWithdrawFeeDenominator: DEFAULT_DENOMINATOR,
+  });
 
   const addMintAddress = (newMintAddress: string) => {
     setMintAddresss([...mintAddresss, newMintAddress]);
@@ -133,19 +143,19 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
 
         if (publicKey) {
           console.log(`pubKey: ${publicKey}`);
-          if (
-            !(await checkTokenBalances(
-              connection,
-              mintAddresss,
-              tokenAmounts,
-              publicKey
-            ))
-          ) {
-            toast(`Not sufficient balance in your wallet. Please, charge!`, {
-              theme: "dark",
-            });
-            return;
-          }
+          // if (
+          //   !(await checkTokenBalances(
+          //     connection,
+          //     mintAddresss,
+          //     tokenAmounts,
+          //     publicKey
+          //   ))
+          // ) {
+          //   toast(`Not sufficient balance in your wallet. Please, charge!`, {
+          //     theme: "dark",
+          //   });
+          //   return;
+          // }
         } else {
           toast(`Please, connect your wallet!`, {
             theme: "dark",
@@ -154,45 +164,48 @@ export const CreateLPModal: React.FC<CreateLPProps> = ({ isShow, onClose }) => {
           return;
         }
 
-        const mintAddrA = "";
-        const mintAddrB = "";
-        const mintAddrS = "";
+        const mintAddrA = "8jHQEQFWhKbiDu742BuSYA6ATGSnqRm1o7mL2U7nU56x";
+        const mintAddrB = "DoNR2rFKf8i1JXkWB2rtZpneBTBfx7LzDYPpGGLkYuwP";
+        const mintAddrS = "DntoFzFtB5C5tqG8P1Hv511YBrPCefpj9M1CWbSrDvgc";
 
         let ataA, ataB, ataS;
-        if (publicKey) {
-          ataA = findAssociatedTokenAddress(
+        if (publicKey) {          
+          ataA = await findAssociatedTokenAddress(
+            connection,
             publicKey,
             new PublicKey(mintAddrA)
           );
-          ataB = findAssociatedTokenAddress(
+          ataB = await findAssociatedTokenAddress(
+            connection,
             publicKey,
             new PublicKey(mintAddrB)
           );
-          ataS = findAssociatedTokenAddress(
+          ataS = await findAssociatedTokenAddress(
+            connection,
             publicKey,
             new PublicKey(mintAddrS)
           );
 
           const components: LiquidityComponent[] = [
             {
+              account: ataS,
+              mintAddress: mintAddrS,
+              amount: 0.1,
+            },
+            {
               account: ataA,
               mintAddress: mintAddrA,
-              amount: 10,
+              amount: 0.1,
             },
             {
               account: ataB,
               mintAddress: mintAddrB,
-              amount: 10,
-            },
-            {
-              account: ataS,
-              mintAddress: mintAddrS,
-              amount: 10,
-            },
+              amount: 0.1,
+            },            
           ];
 
           if (signTransaction) {
-            addLiquidity(publicKey, signTransaction, connection, components, 0);
+            addLiquidity(publicKey, signTransaction, connection, components, options);
           } else {
             toast(`Please, connect your wallet!`, {
               theme: "dark",

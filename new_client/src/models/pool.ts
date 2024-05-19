@@ -5,8 +5,8 @@ export interface PoolInfo {
   pubkeys: {
     program: PublicKey;
     account: PublicKey;
-    holdingAccounts: PublicKey[];
-    holdingMints: PublicKey[];
+    holdingAccounts: PublicKey[]; //token ATA provided to pool
+    holdingMints: PublicKey[];//token mint account provided to pool
     mint: PublicKey;
     feeAccount?: PublicKey;
   };  
@@ -74,6 +74,9 @@ export const createInitPoolInstruction = (
   sysVarRentAccount: PublicKey,
   splAtaProgramId: PublicKey,
   poolProgramId: PublicKey,
+  amountS: number,
+  amountA: number,
+  amountB: number,
 ): TransactionInstruction => {
   const keys = [
     { pubkey: payerAccount, isSigner: false, isWritable: true },
@@ -111,9 +114,9 @@ export const createInitPoolInstruction = (
     const encodeLength = commandDataLayout.encode(
       {
         instruction: 0,
-        reserve_s: 10,
-        reserve_a: 10,
-        reserve_b: 10,        
+        reserve_s: amountS,
+        reserve_a: amountA,
+        reserve_b: amountB,
       },
       data
     );

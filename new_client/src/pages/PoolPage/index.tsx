@@ -40,32 +40,32 @@ export interface PoolTableDataType {
   owner: boolean;
 }
 
-const PoolData: PoolTableDataType[] = [
-  {
-    key: 1,
-    poolName: "(SOL, USDC)",
-    tvl: 115.33,
-    fee: "0.35%",
-    contribution: "1.32 LP",
-    volume: 56.27,
-    mintAddresses: [],
-    tokenNames: ["SOL", "USDC"],
-    tokenWeights: [50, 50],
-    owner: true,
-  },
-  {
-    key: 2,
-    poolName: "(C98, USDC)",
-    tvl: 585.14,
-    fee: "0.25%",    
-    contribution: "0 LP",
-    volume: 230.13,
-    mintAddresses: [],
-    tokenNames: ["C98", "USDC"],
-    tokenWeights: [80, 20],
-    owner: false,
-  },
-];
+// const PoolData: PoolTableDataType[] = [
+//   {
+//     key: 1,
+//     poolName: "(SOL, USDC)",
+//     tvl: 115.33,
+//     fee: "0.35%",
+//     contribution: "1.32 LP",
+//     volume: 56.27,
+//     mintAddresses: [],
+//     tokenNames: ["SOL", "USDC"],
+//     tokenWeights: [50, 50],
+//     owner: true,
+//   },
+//   {
+//     key: 2,
+//     poolName: "(C98, USDC)",
+//     tvl: 585.14,
+//     fee: "0.25%",    
+//     contribution: "0 LP",
+//     volume: 230.13,
+//     mintAddresses: [],
+//     tokenNames: ["C98", "USDC"],
+//     tokenWeights: [80, 20],
+//     owner: false,
+//   },
+// ];
 
 export const PoolPage: React.FC = () => {
   const { connection } = useConnection();
@@ -73,8 +73,8 @@ export const PoolPage: React.FC = () => {
   const { pools } = usePools(connection);  
   const { signTransaction } = useWallet();
 
-  // const [poolData, setPoolData] = useState<PoolTableDataType[]>([]);
-  const [poolData, setPoolData] = useState<PoolTableDataType[]>(PoolData);
+  const [poolData, setPoolData] = useState<PoolTableDataType[]>([]);
+  // const [poolData, setPoolData] = useState<PoolTableDataType[]>(PoolData);
   const [showCreatePoolModal, setShowCreatePoolModal] = useState(false);
   const [showLPDetailModal, setShowLPDetailModal] = useState(false);
   const [activePoolData, setActivePoolData] = useState<PoolTableDataType>({  
@@ -125,7 +125,7 @@ export const PoolPage: React.FC = () => {
       };
     });
   
-    // setPoolData(data);
+    setPoolData(data);
   }, [pools]);
 
   const poolTableColumns: TableProps<PoolTableDataType>["columns"] = [

@@ -230,7 +230,7 @@ impl Processor {
     pool_data.owner = *owner.key;
     pool_data.state = PoolState::Initialized;
     pool_data.mint_lpt = *mint_lpt_acc.key;
-    pool_data.vault = *vault_acc.key;
+    pool_data.vault = *vault_acc.key; // lp token storage account
 
     for i in 0..token_count {
       let mint_item_acc = mint_accs.get(i).ok_or(AppError::MissingAccount)?;

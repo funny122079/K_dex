@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import {
-  Account,
   clusterApiUrl,
   Connection,
   ConfirmOptions,
+  Keypair,
   PublicKey,
   Transaction,
   sendAndConfirmTransaction
@@ -95,7 +95,7 @@ export const sendTransaction = async (
   walletPubKey: PublicKey,
   transaction: Transaction,
   signTransaction: SignerWalletAdapterProps['signTransaction'],
-  signers: Account[],
+  signers: Keypair[],
 ) => {
   let txid;
   try{
@@ -121,9 +121,11 @@ export const sendTransaction = async (
       console.log("sendTransaction Succeed");
     } else {
       console.log("sendTransaction failed.");
+      return null;
     }
   } catch (error) {
     console.log("Connection-sendTransaction error:", error);
+    return null;
   }
       
   return txid;
